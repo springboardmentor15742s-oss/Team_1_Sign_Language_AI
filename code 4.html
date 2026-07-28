@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SignFlow AI - Learner Progress Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .cyan-glow {
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
+        }
+        .violet-glow {
+            box-shadow: 0 0 20px rgba(160, 120, 255, 0.2);
+        }
+        body {
+            background-color: #0F172A;
+            color: #E7E0ED;
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom Radial Progress */
+        .radial-progress {
+            --value: 82;
+            --size: 12rem;
+            --thickness: 1rem;
+            display: grid;
+            place-content: center;
+            width: var(--size);
+            height: var(--size);
+            border-radius: 50%;
+            background: radial-gradient(closest-side, #1E293B 85%, transparent 0%),
+                        conic-gradient(#a078ff calc(var(--value) * 1%), #15121b 0);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#ffdcbb",
+                        "surface-bright": "#3b3742",
+                        "primary-container": "#a078ff",
+                        "on-tertiary-container": "#3f2300",
+                        "on-secondary-fixed": "#001f26",
+                        "on-secondary": "#003640",
+                        "on-primary-fixed-variant": "#5516be",
+                        "on-primary-fixed": "#23005c",
+                        "on-primary": "#3c0091",
+                        "secondary-container": "#03b5d3",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-container": "#00424e",
+                        "on-primary-container": "#340080",
+                        "on-tertiary-fixed": "#2c1700",
+                        "surface-container-high": "#2c2832",
+                        "outline-variant": "#494454",
+                        "on-error": "#690005",
+                        "on-surface-variant": "#cbc3d7",
+                        "surface-tint": "#d0bcff",
+                        "on-background": "#e7e0ed",
+                        "surface": "#15121b",
+                        "secondary-fixed-dim": "#4cd7f6",
+                        "outline": "#958ea0",
+                        "tertiary": "#ffb869",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#e9ddff",
+                        "surface-variant": "#37333d",
+                        "primary": "#d0bcff",
+                        "surface-container-low": "#1d1a23",
+                        "on-tertiary-fixed-variant": "#673d00",
+                        "background": "#15121b",
+                        "primary-fixed-dim": "#d0bcff",
+                        "surface-container": "#211e27",
+                        "surface-container-lowest": "#0f0d15",
+                        "secondary": "#4cd7f6",
+                        "tertiary-container": "#ca801e",
+                        "secondary-fixed": "#acedff",
+                        "on-secondary-fixed-variant": "#004e5c",
+                        "inverse-on-surface": "#322f39",
+                        "inverse-primary": "#6d3bd7",
+                        "tertiary-fixed-dim": "#ffb869",
+                        "surface-container-highest": "#37333d",
+                        "surface-dim": "#15121b",
+                        "error": "#ffb4ab",
+                        "on-tertiary": "#482900",
+                        "on-surface": "#e7e0ed",
+                        "inverse-surface": "#e7e0ed"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "lg": "24px",
+                        "3xl": "64px",
+                        "margin-desktop": "40px",
+                        "xl": "32px",
+                        "unit": "4px",
+                        "2xl": "48px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "xs": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "mono-stats": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "mono-stats": ["20px", {"lineHeight": "24px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="bg-surface/80 dark:bg-surface/80 backdrop-blur-xl border-b border-white/10 shadow-sm sticky top-0 z-50 flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-md max-w-full">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a young adult named Alex, with a friendly expression, wearing a sleek dark tech-wear jacket. The background is a minimalist studio with soft electric violet ambient lighting. The photography style is modern corporate, high resolution, with sharp focus and cinematic depth of field, reflecting a high-performance educational setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiNPJ7ANZOb__mVPHSxtKSb9ZoZXww2IVcHonBtu0_RtELUDgcXP5QQpNgDHv-2Esjw2tWayyhLAuaGPykPMQC5dTHuHgsZA7aIyinkmHzCcKQDQ-Fhbe28Z2i0Awv0inZa7STa18haasgJ8hLLg7BOqhxDLp2TDu6HSHVD4jMfpeti4opHP67hJlBavsKwlGH6VVj8wuU-eH2BSPN7usAuCIt9_ebbuUJLIKVzJGW2BIAMiBdgzMG4-Mg3ukCwYhflKY3_J5bM1o"/>
+</div>
+<div>
+<h1 class="font-display-lg text-headline-md text-primary dark:text-primary tracking-tight">SignFlow AI</h1>
+<p class="text-on-surface-variant font-label-sm text-label-sm">Welcome, Alex!</p>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-primary p-sm hover:opacity-80 transition-opacity active:scale-95 transition-transform" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-primary p-sm hover:opacity-80 transition-opacity active:scale-95 transition-transform" data-icon="settings">settings</button>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop mt-lg space-y-lg">
+<!-- Bento Grid Section -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Progress Intelligence Module (8-cols) -->
+<section class="lg:col-span-8 glass-panel rounded-xl p-lg violet-glow">
+<div class="flex flex-col md:flex-row items-center gap-xl">
+<!-- Circular Gauge -->
+<div class="flex flex-col items-center">
+<div class="radial-progress violet-glow" style="--value: 82;">
+<span class="font-display-lg text-display-lg text-primary">82%</span>
+</div>
+<p class="mt-md font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Mastery Score</p>
+</div>
+<!-- Scores Breakdown -->
+<div class="flex-1 w-full space-y-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">Intelligence Breakdown</h2>
+<div class="space-y-sm">
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>Gesture Accuracy</span>
+<span class="text-secondary">40% / 40%</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-2 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 100%"></div>
+</div>
+</div>
+<div class="space-y-sm">
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>Assessment</span>
+<span class="text-primary">25% / 30%</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 83%"></div>
+</div>
+</div>
+<div class="space-y-sm">
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>Completion</span>
+<span class="text-tertiary">15% / 15%</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-2 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 100%"></div>
+</div>
+</div>
+<div class="flex gap-lg">
+<div class="flex-1">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Consistency</p>
+<p class="font-mono-stats text-mono-stats text-secondary">10%</p>
+</div>
+<div class="flex-1">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Improvement</p>
+<p class="font-mono-stats text-mono-stats text-primary">10%</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Side Widgets (4-cols) -->
+<div class="lg:col-span-4 space-y-lg">
+<!-- Daily Practice Streak -->
+<article class="glass-panel rounded-xl p-lg flex items-center justify-between cyan-glow overflow-hidden relative">
+
+<div class="relative z-10">
+<p class="font-label-md text-label-md text-on-surface-variant">Current Streak</p>
+<h3 class="font-display-lg text-display-lg text-secondary">5 Days</h3>
+<p class="font-label-sm text-label-sm text-secondary/80">Keep it up, Alex!</p>
+</div>
+<div class="relative z-10 bg-secondary/10 p-md rounded-full">
+<span class="material-symbols-outlined text-secondary text-3xl" data-icon="local_fire_department" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+</div>
+</article>
+<!-- Resume Lesson -->
+<article class="glass-panel rounded-xl p-lg border-primary-container/20 border-2">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-sm">Active Course</p>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-lg">ASL Basics: Alphabet &amp; Numbers</h3>
+<div class="flex items-center justify-between mb-lg">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-surface flex items-center justify-center text-xs">A</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-surface flex items-center justify-center text-xs">B</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-surface flex items-center justify-center text-xs">C</div>
+</div>
+<span class="font-label-md text-label-md text-primary">64% Done</span>
+</div>
+<button class="w-full bg-primary-container text-on-primary-container py-md rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined" data-icon="play_arrow">play_arrow</span>
+                        Resume Lesson
+                    </button>
+</article>
+</div>
+<!-- Learning Curve Chart (12-cols) -->
+<section class="lg:col-span-12 glass-panel rounded-xl p-lg min-h-[400px] flex flex-col">
+<div class="flex justify-between items-center mb-lg">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Learning Curve</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Performance over the last 7 days</p>
+</div>
+<div class="flex gap-sm">
+<span class="flex items-center gap-xs font-label-sm text-label-sm text-secondary">
+<span class="w-2 h-2 rounded-full bg-secondary"></span> Accuracy
+                        </span>
+<span class="flex items-center gap-xs font-label-sm text-label-sm text-primary">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Speed
+                        </span>
+</div>
+</div>
+<!-- Chart Visualization Placeholder using CSS and Flex -->
+<div class="flex-1 flex items-end justify-between gap-md pt-lg">
+<!-- Day 1 -->
+<div class="flex-1 flex flex-col items-center gap-sm">
+<div class="w-full flex items-end gap-1 h-48">
+<div class="w-full bg-secondary/30 rounded-t-sm h-[40%]"></div>
+<div class="w-full bg-primary/30 rounded-t-sm h-[30%]"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Mon</span>
+</div>
+<!-- Day 2 -->
+<div class="flex-1 flex flex-col items-center gap-sm">
+<div class="w-full flex items-end gap-1 h-48">
+<div class="w-full bg-secondary/40 rounded-t-sm h-[55%]"></div>
+<div class="w-full bg-primary/40 rounded-t-sm h-[45%]"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Tue</span>
+</div>
+<!-- Day 3 -->
+<div class="flex-1 flex flex-col items-center gap-sm">
+<div class="w-full flex items-end gap-1 h-48">
+<div class="w-full bg-secondary/50 rounded-t-sm h-[70%]"></div>
+<div class="w-full bg-primary/50 rounded-t-sm h-[60%]"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Wed</span>
+</div>
+<!-- Day 4 -->
+<div class="flex-1 flex flex-col items-center gap-sm">
+<div class="w-full flex items-end gap-1 h-48">
+<div class="w-full bg-secondary/60 rounded-t-sm h-[65%]"></div>
+<div class="w-full bg-primary/60 rounded-t-sm h-[75%]"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Thu</span>
+</div>
+<!-- Day 5 -->
+<div class="flex-1 flex flex-col items-center gap-sm">
+<div class="w-full flex items-end gap-1 h-48">
+<div class="w-full bg-secondary/70 rounded-t-sm h-[80%]"></div>
+<div class="w-full bg-primary/70 rounded-t-sm h-[85%]"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Fri</span>
+</div>
+<!-- Day 6 -->
+<div class="flex-1 flex flex-col items-center gap-sm">
+<div class="w-full flex items-end gap-1 h-48">
+<div class="w-full bg-secondary/80 rounded-t-sm h-[90%]"></div>
+<div class="w-full bg-primary/80 rounded-t-sm h-[80%]"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Sat</span>
+</div>
+<!-- Day 7 -->
+<div class="flex-1 flex flex-col items-center gap-sm">
+<div class="w-full flex items-end gap-1 h-48">
+<div class="w-full bg-secondary rounded-t-sm h-[95%] shadow-[0_0_15px_rgba(6,182,212,0.5)]"></div>
+<div class="w-full bg-primary rounded-t-sm h-[92%] shadow-[0_0_15px_rgba(160,120,255,0.5)]"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold">Sun</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-md pb-safe pt-sm bg-surface-container-low/90 dark:bg-surface-container-low/90 backdrop-blur-2xl border-t border-white/5 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="videocam">videocam</span>
+<span class="font-label-sm text-label-sm">Practice</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-sm text-label-sm">Progress</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-sm text-label-sm">Reports</span>
+</a>
+</nav>
+</body></html>
