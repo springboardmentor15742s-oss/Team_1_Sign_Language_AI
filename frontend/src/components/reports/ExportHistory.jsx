@@ -18,10 +18,16 @@ export default function ExportHistory({ history = [] }) {
   return (
     <div className="flex flex-col gap-2">
       {history.map((item, i) => {
-        const fc = FORMAT_COLORS[item.format] || { text: 'text-white/50', bg: 'bg-white/5', border: 'border-white/10' };
+        const rawFmt = item.format || 'PDF';
+        const keyFmt = rawFmt.includes('PDF') ? 'PDF' : rawFmt.includes('Excel') ? 'Excel' : rawFmt.includes('CSV') ? 'CSV' : 'PDF';
+        const fc = FORMAT_COLORS[keyFmt] || { text: 'text-white/50', bg: 'bg-white/5', border: 'border-white/10' };
+        const title = item.reportTitle || item.reportName || 'Exported Document';
+        const dateStr = item.date || item.timestamp || 'Recently';
+        const icon = item.icon || (keyFmt === 'PDF' ? '📄' : keyFmt === 'Excel' ? '📊' : '📁');
+
         return (
           <motion.div
-            key={item.id}
+            key={item.id || i}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.06 }}
@@ -31,14 +37,14 @@ export default function ExportHistory({ history = [] }) {
             onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; }}
           >
             <div className="flex items-center gap-3 min-w-0">
-              <span className="text-lg flex-shrink-0">{item.icon}</span>
+              <span className="text-lg flex-shrink-0">{icon}</span>
               <div className="flex flex-col min-w-0">
-                <span className="text-xs font-semibold text-white/80 truncate">{item.reportTitle}</span>
-                <span className="text-[10px] text-white/30">{item.date} · {item.size}</span>
+                <span className="text-xs font-semibold text-white/80 truncate">{title}</span>
+                <span className="text-[10px] text-white/30">{dateStr} · {item.size || '1.5 MB'}</span>
               </div>
             </div>
             <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border flex-shrink-0 ${fc.text} ${fc.bg} ${fc.border}`}>
-              {item.format}
+              {keyFmt}
             </span>
           </motion.div>
         );

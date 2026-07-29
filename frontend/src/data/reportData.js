@@ -17,9 +17,13 @@ export const STATUS_CONFIG = {
 };
 
 export const REPORT_STATISTICS = {
+  total: 24,
   totalReports: 24,
   generatedThisMonth: 8,
+  totalDownloads: 142,
   totalExports: 14,
+  mostViewed: 'Monthly Progress',
+  lastGenerated: 'Jul 28, 2026',
   avgAccuracy: '94.2%',
   activeCertificates: 3,
   practiceHours: '48.5 hrs',
@@ -118,7 +122,7 @@ export const PERFORMANCE_REPORT_DATA = {
 export const PROGRESS_REPORT_DATA = {
   title: 'Curriculum & Mastery Progress Report',
   summary: 'Milestone tracking detailing completed skills, upcoming modules, and estimated completion timeline.',
-  overallProgress: 76, // Percentage
+  overallProgress: 76,
   completedSkills: 38,
   remainingSkills: 12,
   estimatedCompletion: '3 Weeks (Aug 20, 2026)',
@@ -178,11 +182,133 @@ export const ACHIEVEMENTS_DATA = [
 ];
 
 export const RECENT_REPORTS_LIST = [
-  { id: 'RPT-001', title: 'Monthly Learning Progress — July 2026', type: 'Learning', status: 'generated', date: 'Jul 28, 2026', category: 'learning' },
-  { id: 'RPT-002', title: 'Level 2 Assessment Summary', type: 'Assessment', status: 'generated', date: 'Jul 25, 2026', category: 'assessment' },
-  { id: 'RPT-003', title: 'Weekly Performance Scoring Log', type: 'Performance', status: 'generated', date: 'Jul 22, 2026', category: 'performance' },
-  { id: 'RPT-004', title: 'Curriculum Mastery & Progress', type: 'Progress', status: 'generated', date: 'Jul 18, 2026', category: 'progress' },
-  { id: 'RPT-005', title: 'Digital Certificates Audit Report', type: 'Certificates', status: 'generated', date: 'Jul 15, 2026', category: 'certificates' },
+  {
+    id: 'RPT-001',
+    title: 'Monthly Learning Progress — July 2026',
+    type: 'Learning',
+    status: 'generated',
+    date: 'Jul 28, 2026',
+    generatedDate: 'Jul 28, 2026',
+    category: 'learning',
+    color: [168, 85, 247],
+    views: 142,
+    downloads: 38,
+    chartData: [65, 70, 78, 82, 87, 92, 95],
+    chartLabels: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7'],
+    metrics: [
+      { label: 'Mastery Score', value: '88%', change: '+4.2%', changeDir: 'up' },
+      { label: 'Practice Hours', value: '24.5 hrs', change: '+3.8 hrs', changeDir: 'up' },
+      { label: 'Streak', value: '14 Days', change: 'Active', changeDir: 'up' },
+      { label: 'Lessons Done', value: '48 / 72', change: '+6', changeDir: 'up' },
+    ],
+    skillImprovement: [
+      { skill: 'Alphabet & Numbers', curr: 95, prev: 80 },
+      { skill: 'Greetings & Phrasals', curr: 92, prev: 78 },
+      { skill: 'Emergency Signs', curr: 84, prev: 70 },
+      { skill: 'Facial Expressions', curr: 78, prev: 65 },
+    ],
+    recommendations: [
+      'Sustain current 14-day streak to unlock Advanced Conversational Certificate.',
+      'Focus on Facial Expressions module to raise overall mastery above 90%.',
+    ],
+    tableRows: [
+      { id: 'act-1', activity: 'Completed Lesson: Medical Signs 2', category: 'Learning', time: 'Jul 28, 2026 14:10', status: 'Completed' },
+      { id: 'act-2', activity: 'Passed Practice Speed Drill (94%)', category: 'Assessment', time: 'Jul 27, 2026 18:30', status: 'Passed' },
+    ],
+  },
+  {
+    id: 'RPT-002',
+    title: 'Level 2 Assessment Summary',
+    type: 'Assessment',
+    status: 'generated',
+    date: 'Jul 25, 2026',
+    generatedDate: 'Jul 25, 2026',
+    category: 'assessment',
+    color: [59, 130, 246],
+    views: 98,
+    downloads: 24,
+    chartData: [82, 85, 88, 92, 96.5],
+    chartLabels: ['Ex 1', 'Ex 2', 'Ex 3', 'Ex 4', 'Ex 5'],
+    metrics: [
+      { label: 'Exams Passed', value: '12 / 12', change: '100%', changeDir: 'up' },
+      { label: 'Avg Exam Score', value: '92.4%', change: '+3.1%', changeDir: 'up' },
+      { label: 'Highest Score', value: '98.5%', change: 'Record', changeDir: 'up' },
+      { label: 'Speed Index', value: '2.1s', change: '-0.4s', changeDir: 'up' },
+    ],
+    skillImprovement: [
+      { skill: 'Speed Recognition', curr: 94, prev: 82 },
+      { skill: 'Hand Orientation', curr: 96, prev: 88 },
+    ],
+    recommendations: [
+      'Attempt Level 3 Advanced Certification Exam next.',
+    ],
+    tableRows: [
+      { id: 'act-3', activity: 'Submitted Level 2 Final Exam', category: 'Assessment', time: 'Jul 25, 2026 10:00', status: 'Passed' },
+    ],
+  },
+  {
+    id: 'RPT-003',
+    title: 'Weekly Performance Scoring Log',
+    type: 'Performance',
+    status: 'generated',
+    date: 'Jul 22, 2026',
+    generatedDate: 'Jul 22, 2026',
+    category: 'performance',
+    color: [34, 197, 94],
+    views: 74,
+    downloads: 18,
+    chartData: [88, 90, 92, 94, 96.5],
+    chartLabels: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5'],
+    metrics: [
+      { label: 'Overall Score', value: '94.2', change: '+2.4', changeDir: 'up' },
+      { label: 'Global Rank', value: '#4', change: '+2 places', changeDir: 'up' },
+      { label: 'Consistency', value: '98%', change: 'Top 5%', changeDir: 'up' },
+    ],
+    skillImprovement: [],
+    recommendations: [],
+    tableRows: [],
+  },
+  {
+    id: 'RPT-004',
+    title: 'Curriculum Mastery & Progress',
+    type: 'Progress',
+    status: 'generated',
+    date: 'Jul 18, 2026',
+    generatedDate: 'Jul 18, 2026',
+    category: 'progress',
+    color: [245, 158, 11],
+    views: 65,
+    downloads: 12,
+    chartData: [40, 52, 63, 71, 76],
+    chartLabels: ['M1', 'M2', 'M3', 'M4', 'M5'],
+    metrics: [
+      { label: 'Total Progress', value: '76%', change: '+5%', changeDir: 'up' },
+      { label: 'Skills Mastered', value: '38', change: '+4', changeDir: 'up' },
+    ],
+    skillImprovement: [],
+    recommendations: [],
+    tableRows: [],
+  },
+  {
+    id: 'RPT-005',
+    title: 'Digital Certificates Audit Report',
+    type: 'Certificates',
+    status: 'generated',
+    date: 'Jul 15, 2026',
+    generatedDate: 'Jul 15, 2026',
+    category: 'certificates',
+    color: [236, 72, 153],
+    views: 52,
+    downloads: 19,
+    chartData: [1, 1, 2, 2, 3],
+    chartLabels: ['May', 'Jun', 'Jul W1', 'Jul W2', 'Jul W3'],
+    metrics: [
+      { label: 'Earned Badges', value: '3', change: 'Verified', changeDir: 'up' },
+    ],
+    skillImprovement: [],
+    recommendations: [],
+    tableRows: [],
+  },
 ];
 
 export const EXPORT_FORMATS = [
@@ -193,13 +319,12 @@ export const EXPORT_FORMATS = [
 ];
 
 export const EXPORT_HISTORY = [
-  { id: 'EXP-101', format: 'PDF Document', reportName: 'Monthly Learning Progress', timestamp: 'Jul 28, 2026 · 14:20', size: '2.4 MB' },
-  { id: 'EXP-102', format: 'Excel Spreadsheet', reportName: 'Assessment Scores Export', timestamp: 'Jul 25, 2026 · 09:15', size: '850 KB' },
-  { id: 'EXP-103', format: 'PDF Document', reportName: 'Certificate Verification Audit', timestamp: 'Jul 20, 2026 · 16:45', size: '1.8 MB' },
+  { id: 'EXP-101', format: 'PDF', reportTitle: 'Monthly Learning Progress', reportName: 'Monthly Learning Progress', date: 'Jul 28, 2026', timestamp: 'Jul 28, 2026 · 14:20', size: '2.4 MB', icon: '📄' },
+  { id: 'EXP-102', format: 'Excel', reportTitle: 'Assessment Scores Export', reportName: 'Assessment Scores Export', date: 'Jul 25, 2026', timestamp: 'Jul 25, 2026 · 09:15', size: '850 KB', icon: '📊' },
+  { id: 'EXP-103', format: 'PDF', reportTitle: 'Certificate Verification Audit', reportName: 'Certificate Verification Audit', date: 'Jul 20, 2026', timestamp: 'Jul 20, 2026 · 16:45', size: '1.8 MB', icon: '🎓' },
 ];
 
 export const exportHistory = EXPORT_HISTORY;
-
 export const reports = RECENT_REPORTS_LIST;
 export const reportStats = REPORT_STATISTICS;
 export const analyticsData = {
@@ -208,4 +333,11 @@ export const analyticsData = {
   gestureAccuracyTrend: [92, 94, 91, 95, 96],
   assessmentTrend: [85, 88, 92, 96, 98],
   practiceConsistency: [1.8, 2.2, 1.5, 2.8, 2.0, 3.2, 1.0],
+  learningGrowth: [65, 70, 75, 82, 88, 92],
+  skillImprovement: [
+    { skill: 'Alphabet & Numbers', curr: 95, prev: 80 },
+    { skill: 'Greetings & Phrasals', curr: 92, prev: 78 },
+    { skill: 'Emergency Signs', curr: 84, prev: 70 },
+    { skill: 'Facial Expressions', curr: 78, prev: 65 },
+  ],
 };

@@ -4,8 +4,11 @@ import { STATUS_CONFIG } from '../../data/reportData';
 
 export default function ReportCard({ report, index = 0 }) {
   const navigate = useNavigate();
-  const [r, g, b] = report.color;
-  const status = STATUS_CONFIG[report.status];
+  const [r, g, b] = report?.color || [139, 92, 246];
+  const status = STATUS_CONFIG[report?.status] || STATUS_CONFIG.generated;
+  const genDate = report?.generatedDate || report?.date || 'Jul 28, 2026';
+  const downloads = report?.downloads ?? 12;
+  const views = report?.views ?? 45;
 
   return (
     <motion.div
@@ -42,18 +45,18 @@ export default function ReportCard({ report, index = 0 }) {
       {/* Title & Type */}
       <div className="relative z-10 flex flex-col gap-1">
         <h3 className="text-sm font-semibold text-white/90 group-hover:text-white transition-colors leading-snug line-clamp-2">
-          {report.title}
+          {report?.title}
         </h3>
         <span
           className="text-[10px] font-semibold px-2 py-0.5 rounded-full w-fit"
           style={{ background: `rgba(${r},${g},${b},0.12)`, color: `rgb(${r},${g},${b})` }}
         >
-          {report.type}
+          {report?.type}
         </span>
       </div>
 
       {/* Mini bar chart */}
-      {report.chartData && report.chartData.length > 0 && (
+      {report?.chartData && report.chartData.length > 0 && (
         <div className="flex items-end gap-1 h-8 relative z-10">
           {report.chartData.slice(-7).map((val, i) => {
             const max = Math.max(...report.chartData);
@@ -77,21 +80,21 @@ export default function ReportCard({ report, index = 0 }) {
       <div className="flex items-center justify-between relative z-10 pt-1 border-t border-white/5">
         <div className="flex flex-col gap-0.5">
           <span className="text-[10px] text-white/30">Generated</span>
-          <span className="text-xs text-white/60 font-medium">{report.generatedDate}</span>
+          <span className="text-xs text-white/60 font-medium">{genDate}</span>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1 text-white/30">
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            <span className="text-[10px]">{report.downloads}</span>
+            <span className="text-[10px]">{downloads}</span>
           </div>
           <div className="flex items-center gap-1 text-white/30">
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            <span className="text-[10px]">{report.views}</span>
+            <span className="text-[10px]">{views}</span>
           </div>
           <span
             className="text-[10px] font-bold group-hover:gap-2 transition-all flex items-center gap-1"

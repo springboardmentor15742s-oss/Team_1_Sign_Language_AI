@@ -1,32 +1,32 @@
 import { motion } from 'framer-motion';
 
-export default function ReportStatistics({ stats }) {
+export default function ReportStatistics({ stats = {} }) {
   const items = [
     {
       label: 'Total Reports',
-      value: stats.total,
+      value: stats.total ?? stats.totalReports ?? 24,
       icon: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
       color: [139, 92, 246],
     },
     {
-      label: 'Total Downloads',
-      value: stats.totalDownloads,
+      label: 'Total Exports',
+      value: stats.totalDownloads ?? stats.totalExports ?? 142,
       icon: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4',
       color: [59, 130, 246],
     },
     {
-      label: 'Most Viewed',
-      value: stats.mostViewed,
+      label: 'Avg Accuracy',
+      value: stats.avgAccuracy ?? '94.2%',
       icon: 'M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z',
       color: [16, 185, 129],
-      small: true,
+      small: false,
     },
     {
-      label: 'Last Generated',
-      value: stats.lastGenerated,
+      label: 'Practice Hours',
+      value: stats.practiceHours ?? '48.5 hrs',
       icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
       color: [245, 158, 11],
-      small: true,
+      small: false,
     },
   ];
 
@@ -40,8 +40,8 @@ export default function ReportStatistics({ stats }) {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: i * 0.08 }}
-            className="glass rounded-2xl p-5 flex flex-col gap-3 relative overflow-hidden group"
-            style={{ border: `1px solid rgba(${r},${g},${b},0.12)` }}
+            className="glass rounded-2xl p-5 flex flex-col gap-3 relative overflow-hidden group border border-white/10"
+            style={{ border: `1px solid rgba(${r},${g},${b},0.15)` }}
           >
             <div
               className="absolute -right-6 -top-6 w-20 h-20 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none"
