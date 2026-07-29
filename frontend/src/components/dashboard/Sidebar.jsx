@@ -14,7 +14,9 @@ const icons = {
   certifications: 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z',
   users: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
   analytics: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6',
-  settings: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z'
+  settings: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z',
+  notifications: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9',
+  accuracy: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
 };
 
 const navConfig = {
@@ -23,20 +25,24 @@ const navConfig = {
     { id: 'courses', label: 'Courses', route: '/courses', icon: icons.courses },
     { id: 'profile', label: 'Profile', route: '/profile', icon: icons.profile },
     { id: 'progress', label: 'Intelligence', route: '/learning-intelligence', icon: icons.analytics },
+    { id: 'performance', label: 'Performance', route: '/performance', icon: icons.reports },
+    { id: 'accuracy', label: 'Sign Accuracy', route: '/accuracy', icon: icons.accuracy },
     { id: 'assessments', label: 'Assessments', route: '/assessments', icon: icons.assessments },
     { id: 'certifications', label: 'Certifications', route: '/certificates', icon: icons.certifications },
+    { id: 'reports', label: 'Reports', route: '/reports', icon: icons.reports },
+    { id: 'notifications', label: 'Notifications', route: '/notifications', icon: icons.notifications },
   ],
   'Instructor': [
     { id: 'dashboard', label: 'Dashboard', route: '/instructor-dashboard', icon: icons.dashboard },
     { id: 'students', label: 'Students', route: '#', icon: icons.students },
     { id: 'courses', label: 'Courses', route: '#', icon: icons.courses },
     { id: 'assessments', label: 'Assessments', route: '/assessments', icon: icons.assessments },
-    { id: 'reports', label: 'Reports', route: '#', icon: icons.reports },
+    { id: 'reports', label: 'Reports', route: '/reports', icon: icons.reports },
   ],
   'Accessibility Trainer': [
     { id: 'dashboard', label: 'Dashboard', route: '/trainer-dashboard', icon: icons.dashboard },
     { id: 'learners', label: 'Learners', route: '#', icon: icons.students },
-    { id: 'skill-reports', label: 'Skill Reports', route: '#', icon: icons.reports },
+    { id: 'skill-reports', label: 'Skill Reports', route: '/reports', icon: icons.reports },
     { id: 'certifications', label: 'Certifications', route: '/certificates', icon: icons.certifications },
   ],
   'Administrator': [

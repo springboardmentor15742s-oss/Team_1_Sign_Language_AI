@@ -108,6 +108,63 @@ export default function LearnerDashboard() {
                 <div className="bg-gradient-to-r from-pink-500 to-purple-500 h-full rounded-full" style={{ width: '68%' }} />
               </div>
             </div>
+
+            {/* ─── Performance Quick Action ──────────────────── */}
+            <a
+              href="/performance"
+              className="glass rounded-2xl p-4 flex flex-col gap-1.5 flex-1 min-w-[150px] group hover:bg-white/[0.04] transition-all"
+              style={{ border: '1px solid rgba(139,92,246,0.2)' }}
+            >
+              <span className="text-xs text-white/40 font-medium">Performance Score</span>
+              <span className="text-xl font-space font-bold" style={{ color: '#a855f7' }}>87 / 100</span>
+              <span className="text-[10px] text-purple-400 font-semibold flex items-center gap-1 mt-1 group-hover:gap-2 transition-all">
+                View Report →
+              </span>
+            </a>
+
+            {/* ─── Notifications Quick Action ─────────────────── */}
+            <a
+              href="/notifications"
+              className="glass rounded-2xl p-4 flex flex-col gap-1.5 flex-1 min-w-[150px] group hover:bg-white/[0.04] transition-all"
+              style={{ border: '1px solid rgba(236,72,153,0.2)' }}
+            >
+              <span className="text-xs text-white/40 font-medium">Notifications</span>
+              <span className="text-xl font-space font-bold flex items-center gap-2" style={{ color: '#ec4899' }}>
+                3 Unread
+                <span className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
+              </span>
+              <span className="text-[10px] text-pink-400 font-semibold flex items-center gap-1 mt-1 group-hover:gap-2 transition-all">
+                View All →
+              </span>
+            </a>
+
+            {/* ─── Sign Accuracy Quick Action ───────────────── */}
+            <a
+              href="/accuracy"
+              className="glass rounded-2xl p-4 flex flex-col gap-1.5 flex-1 min-w-[150px] group hover:bg-white/[0.04] transition-all"
+              style={{ border: '1px solid rgba(34,197,94,0.3)' }}
+            >
+              <span className="text-xs text-white/40 font-medium">Sign Accuracy</span>
+              <span className="text-xl font-space font-bold text-green-400">94.2%</span>
+              <span className="text-[10px] text-green-400 font-semibold flex items-center gap-1 mt-1 group-hover:gap-2 transition-all">
+                View Accuracy →
+              </span>
+            </a>
+
+            {/* ─── Reports Quick Action ───────────────────────── */}
+            <a
+              href="/reports"
+              className="glass rounded-2xl p-4 flex flex-col gap-1.5 flex-1 min-w-[150px] group hover:bg-white/[0.04] transition-all"
+              style={{ border: '1px solid rgba(99,102,241,0.2)' }}
+            >
+              <span className="text-xs text-white/40 font-medium">Reports</span>
+              <span className="text-xl font-space font-bold" style={{ color: '#818cf8' }}>
+                6 Reports
+              </span>
+              <span className="text-[10px] text-indigo-400 font-semibold flex items-center gap-1 mt-1 group-hover:gap-2 transition-all">
+                View Reports →
+              </span>
+            </a>
           </div>
         </div>
       </motion.div>

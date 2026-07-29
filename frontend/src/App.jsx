@@ -36,6 +36,9 @@ import GestureRecognitionPage from './pages/GestureRecognitionPage';
 
 // Module 6: Sign Accuracy Assessment Engine
 import AssessmentPage from './pages/AssessmentPage';
+import AccuracyDashboardPage from './pages/accuracy/AccuracyDashboardPage';
+import AccuracyHistoryPage from './pages/accuracy/AccuracyHistoryPage';
+import AccuracyReportDetailsPage from './pages/accuracy/AccuracyReportDetailsPage';
 
 // Module 7: AI Feedback & Correction Engine
 import FeedbackPage from './pages/FeedbackPage';
@@ -53,6 +56,22 @@ import AssessmentDashboardPage from './pages/certification/AssessmentDashboardPa
 import AssessmentDetailsPage from './pages/certification/AssessmentDetailsPage';
 import CertificationDashboardPage from './pages/certification/CertificationDashboardPage';
 import CertificatePreviewPage from './pages/certification/CertificatePreviewPage';
+
+// Module 10: Performance Scoring Engine
+import PerformancePage from './pages/PerformancePage';
+
+// Module 12: Notification & Reminder System
+import NotificationPage from './pages/NotificationPage';
+import ReminderPage from './pages/ReminderPage';
+
+// Module 13: Reports & Export System
+import ReportsPage from './pages/ReportsPage';
+import ReportDetailsPage from './pages/ReportDetailsPage';
+import LearningReportPage from './pages/reports/LearningReportPage';
+import AssessmentReportPage from './pages/reports/AssessmentReportPage';
+import PerformanceReportPage from './pages/reports/PerformanceReportPage';
+import ProgressReportPage from './pages/reports/ProgressReportPage';
+import CertificateReportPage from './pages/reports/CertificateReportPage';
 
 /* ─── Landing Page ─────────────────────────────────────────── */
 function LandingPage() {
@@ -153,6 +172,11 @@ function AnimatedRoutes() {
     '/edit-profile',
     '/assessments',
     '/certificates',
+    '/performance',
+    '/notifications',
+    '/reminders',
+    '/reports',
+    '/accuracy',
   ].some(p => location.pathname.startsWith(p));
 
   if (isDashboardRoute) {
@@ -169,6 +193,54 @@ function AnimatedRoutes() {
                 element={
                   <ProtectedRoute allowedRoles={['Learner']}>
                     <LearnerDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/accuracy"
+                element={
+                  <ProtectedRoute allowedRoles={['Learner', 'Instructor', 'Accessibility Trainer', 'Administrator']}>
+                    <AccuracyDashboardPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/accuracy/history"
+                element={
+                  <ProtectedRoute allowedRoles={['Learner', 'Instructor', 'Accessibility Trainer', 'Administrator']}>
+                    <AccuracyHistoryPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/accuracy/report/:reportId"
+                element={
+                  <ProtectedRoute allowedRoles={['Learner', 'Instructor', 'Accessibility Trainer', 'Administrator']}>
+                    <AccuracyReportDetailsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/performance"
+                element={
+                  <ProtectedRoute allowedRoles={['Learner']}>
+                    <PerformancePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/notifications"
+                element={
+                  <ProtectedRoute allowedRoles={['Learner', 'Instructor', 'Accessibility Trainer', 'Administrator']}>
+                    <NotificationPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/reminders"
+                element={
+                  <ProtectedRoute allowedRoles={['Learner', 'Instructor', 'Accessibility Trainer', 'Administrator']}>
+                    <ReminderPage />
                   </ProtectedRoute>
                 }
               />
@@ -249,6 +321,62 @@ function AnimatedRoutes() {
                 element={
                   <ProtectedRoute allowedRoles={['Learner', 'Instructor', 'Accessibility Trainer', 'Administrator']}>
                     <CertificatePreviewPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/reports"
+                element={
+                  <ProtectedRoute allowedRoles={['Learner', 'Instructor', 'Accessibility Trainer', 'Administrator']}>
+                    <ReportsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/reports/learning"
+                element={
+                  <ProtectedRoute allowedRoles={['Learner', 'Instructor', 'Accessibility Trainer', 'Administrator']}>
+                    <LearningReportPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/reports/assessment"
+                element={
+                  <ProtectedRoute allowedRoles={['Learner', 'Instructor', 'Accessibility Trainer', 'Administrator']}>
+                    <AssessmentReportPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/reports/performance"
+                element={
+                  <ProtectedRoute allowedRoles={['Learner', 'Instructor', 'Accessibility Trainer', 'Administrator']}>
+                    <PerformanceReportPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/reports/progress"
+                element={
+                  <ProtectedRoute allowedRoles={['Learner', 'Instructor', 'Accessibility Trainer', 'Administrator']}>
+                    <ProgressReportPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/reports/certificates"
+                element={
+                  <ProtectedRoute allowedRoles={['Learner', 'Instructor', 'Accessibility Trainer', 'Administrator']}>
+                    <CertificateReportPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/reports/:reportId"
+                element={
+                  <ProtectedRoute allowedRoles={['Learner', 'Instructor', 'Accessibility Trainer', 'Administrator']}>
+                    <ReportDetailsPage />
                   </ProtectedRoute>
                 }
               />
