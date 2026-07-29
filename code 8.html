@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reports &amp; Analytics | SignFlow AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #15121b;
+            color: #e7e0ed;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(21, 18, 27, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4cd7f6;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="bg-surface/80 dark:bg-surface/80 backdrop-blur-xl border-b border-white/10 shadow-sm sticky top-0 z-50 flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-md max-w-full">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/20">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a young learner in a tech-focused educational environment. The lighting is crisp and cool, with soft purple and cyan ambient glows in the background reflecting a high-tech ASL learning laboratory. The style is modern corporate, clean and empowering, aligning with the SignFlow AI brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTij3MTBD4f921Vgeg3sVrOQwQfQGgo1VIzYvwPkogX4LylCny6LpqwswXqZYQ9fUi0vk7zBVOthLoLF8hyRQNbPh2LJbmGhwb2fwH4Pw-kLBryiVG_DXZLDX2gJTJ4TX56DEBSY0IJ5FbaCWijaOsMJthTCjWmwSvl2ViqI5_YrPqw0LrNMn2qMhh_Bg3OzpeKtFTQOFkZCX4HwnfTqR7yi6ONE75n0NdIkskgRikUyXAjoAV-6uvl9bmz8RINf946GpILSZTfhk"/>
+</div>
+<h1 class="font-display-lg text-headline-md text-primary dark:text-primary tracking-tight">SignFlow AI</h1>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-primary hover:opacity-80 transition-opacity active:scale-95 transition-transform">notifications</button>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop pt-lg space-y-lg">
+<!-- Header & Filters -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div class="space-y-xs">
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Reports &amp; Analytics</h2>
+<p class="font-body-md text-on-surface-variant">Deep dive into your linguistic progression and accuracy metrics.</p>
+</div>
+<div class="flex items-center bg-surface-container-low rounded-xl p-1 border border-white/5">
+<button class="px-4 py-2 text-label-md rounded-lg bg-primary text-on-primary shadow-lg transition-all">Weekly</button>
+<button class="px-4 py-2 text-label-md text-on-surface-variant hover:text-on-surface transition-colors">Monthly</button>
+<button class="px-4 py-2 text-label-md text-on-surface-variant hover:text-on-surface transition-colors">Yearly</button>
+</div>
+</section>
+<!-- Bento Grid: Main Analytics -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Weekly Performance Summary -->
+<div class="lg:col-span-8 glass-panel p-lg rounded-2xl space-y-lg">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-on-surface">Weekly Performance Summary</h3>
+<p class="font-label-sm text-on-surface-variant">Comparative analysis of Accuracy vs. Consistency</p>
+</div>
+<div class="flex gap-md">
+<div class="flex items-center gap-xs">
+<span class="w-3 h-3 rounded-full bg-secondary"></span>
+<span class="text-label-sm text-on-surface-variant">Accuracy</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="text-label-sm text-on-surface-variant">Consistency</span>
+</div>
+</div>
+</div>
+<div class="h-64 md:h-80 w-full">
+<canvas id="performanceChart"></canvas>
+</div>
+</div>
+<!-- Skills Matrix (Radar) -->
+<div class="lg:col-span-4 glass-panel p-lg rounded-2xl space-y-lg">
+<div>
+<h3 class="font-headline-md text-on-surface">Skills Matrix</h3>
+<p class="font-label-sm text-on-surface-variant">ASL Proficiency by Category</p>
+</div>
+<div class="h-64 flex items-center justify-center">
+<canvas id="skillsRadar"></canvas>
+</div>
+<div class="grid grid-cols-2 gap-sm">
+<div class="bg-surface-container-lowest p-md rounded-xl border border-white/5">
+<p class="text-label-sm text-on-surface-variant">Highest Skill</p>
+<p class="text-headline-md text-secondary">Alphabet</p>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-xl border border-white/5">
+<p class="text-label-sm text-on-surface-variant">Avg Score</p>
+<p class="text-headline-md text-primary">92%</p>
+</div>
+</div>
+</div>
+<!-- Recent Assessments Table -->
+<div class="lg:col-span-12 glass-panel rounded-2xl overflow-hidden">
+<div class="p-lg border-b border-white/5 flex justify-between items-center">
+<h3 class="font-headline-md text-on-surface">Recent Assessments</h3>
+<button class="text-label-md text-secondary flex items-center gap-xs hover:underline transition-all">
+                        View All <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left">
+<thead class="bg-surface-container-high/50 text-label-sm text-on-surface-variant">
+<tr>
+<th class="px-lg py-md font-medium">ASSESSMENT NAME</th>
+<th class="px-lg py-md font-medium">DATE</th>
+<th class="px-lg py-md font-medium">CATEGORY</th>
+<th class="px-lg py-md font-medium">SCORE</th>
+<th class="px-lg py-md font-medium">STATUS</th>
+<th class="px-lg py-md font-medium text-right">ACTION</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5 font-body-md">
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-lg py-lg font-semibold text-on-surface">Daily Review: Medical Terms</td>
+<td class="px-lg py-lg text-on-surface-variant">Oct 24, 2023</td>
+<td class="px-lg py-lg">
+<span class="px-3 py-1 rounded-full bg-secondary-container/20 text-secondary text-label-sm">Phrases</span>
+</td>
+<td class="px-lg py-lg">
+<div class="flex items-center gap-sm">
+<div class="w-12 bg-white/10 h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 98%"></div>
+</div>
+<span class="text-secondary font-mono-stats">98%</span>
+</div>
+</td>
+<td class="px-lg py-lg text-emerald-400 flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">check_circle</span> Mastered
+                                </td>
+<td class="px-lg py-lg text-right">
+<button class="px-4 py-2 bg-primary/10 text-primary rounded-lg text-label-md font-bold group-hover:bg-primary group-hover:text-on-primary transition-all active:scale-95">View Feedback</button>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-lg py-lg font-semibold text-on-surface">Emergency Response Set</td>
+<td class="px-lg py-lg text-on-surface-variant">Oct 22, 2023</td>
+<td class="px-lg py-lg">
+<span class="px-3 py-1 rounded-full bg-primary-container/20 text-primary text-label-sm">Expressions</span>
+</td>
+<td class="px-lg py-lg">
+<div class="flex items-center gap-sm">
+<div class="w-12 bg-white/10 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 84%"></div>
+</div>
+<span class="text-primary font-mono-stats">84%</span>
+</div>
+</td>
+<td class="px-lg py-lg text-on-surface-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">schedule</span> Pending Review
+                                </td>
+<td class="px-lg py-lg text-right">
+<button class="px-4 py-2 bg-primary/10 text-primary rounded-lg text-label-md font-bold group-hover:bg-primary group-hover:text-on-primary transition-all active:scale-95">View Feedback</button>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-lg py-lg font-semibold text-on-surface">Fingerspelling Mastery III</td>
+<td class="px-lg py-lg text-on-surface-variant">Oct 20, 2023</td>
+<td class="px-lg py-lg">
+<span class="px-3 py-1 rounded-full bg-tertiary-container/20 text-tertiary text-label-sm">Alphabet</span>
+</td>
+<td class="px-lg py-lg">
+<div class="flex items-center gap-sm">
+<div class="w-12 bg-white/10 h-1.5 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full" style="width: 100%"></div>
+</div>
+<span class="text-tertiary font-mono-stats">100%</span>
+</div>
+</td>
+<td class="px-lg py-lg text-emerald-400 flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">stars</span> Perfect
+                                </td>
+<td class="px-lg py-lg text-right">
+<button class="px-4 py-2 bg-primary/10 text-primary rounded-lg text-label-md font-bold group-hover:bg-primary group-hover:text-on-primary transition-all active:scale-95">View Feedback</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Export Data Section -->
+<div class="lg:col-span-12 glass-panel p-lg rounded-2xl flex flex-col md:flex-row items-center justify-between gap-lg">
+<div class="space-y-xs text-center md:text-left">
+<h3 class="font-headline-md text-on-surface">Export Performance Data</h3>
+<p class="font-body-md text-on-surface-variant">Generate detailed reports for professional certification or academic records.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-md">
+<button class="flex items-center gap-sm px-6 py-3 bg-surface-container-high hover:bg-surface-bright text-on-surface rounded-xl border border-white/10 transition-all active:scale-95">
+<span class="material-symbols-outlined text-secondary">picture_as_pdf</span>
+<span class="font-label-md">Download PDF Report</span>
+</button>
+<button class="flex items-center gap-sm px-6 py-3 bg-surface-container-high hover:bg-surface-bright text-on-surface rounded-xl border border-white/10 transition-all active:scale-95">
+<span class="material-symbols-outlined text-primary">table_view</span>
+<span class="font-label-md">Export Excel (CSV)</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-md pb-safe pt-sm bg-surface-container-low/90 dark:bg-surface-container-low/90 backdrop-blur-2xl border-t border-white/5 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-90 transition-transform duration-200 py-1" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-90 transition-transform duration-200 py-1" href="#">
+<span class="material-symbols-outlined">videocam</span>
+<span class="font-label-sm text-label-sm">Practice</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-90 transition-transform duration-200 py-1" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-sm text-label-sm">Progress</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-sm text-label-sm">Reports</span>
+</a>
+</nav>
+<script>
+        // Chart.js Configuration
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctxPerformance = document.getElementById('performanceChart').getContext('2d');
+            new Chart(ctxPerformance, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Accuracy',
+                        data: [85, 78, 92, 88, 95, 90, 97],
+                        backgroundColor: '#4cd7f6',
+                        borderRadius: 6,
+                        barThickness: 12
+                    }, {
+                        label: 'Consistency',
+                        data: [70, 85, 75, 90, 82, 88, 95],
+                        backgroundColor: '#d0bcff',
+                        borderRadius: 6,
+                        barThickness: 12
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#cbc3d7', font: { size: 10 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#cbc3d7', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            const ctxRadar = document.getElementById('skillsRadar').getContext('2d');
+            new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: ['Alphabet', 'Numbers', 'Phrases', 'Grammar', 'Expressions', 'Fluidity'],
+                    datasets: [{
+                        label: 'Your Level',
+                        data: [95, 80, 85, 70, 90, 75],
+                        fill: true,
+                        backgroundColor: 'rgba(208, 188, 255, 0.2)',
+                        borderColor: '#d0bcff',
+                        pointBackgroundColor: '#d0bcff',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#d0bcff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: { color: '#cbc3d7', font: { size: 10 } },
+                            ticks: { display: false }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body></html>
