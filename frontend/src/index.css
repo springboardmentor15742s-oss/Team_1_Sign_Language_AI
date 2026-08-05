@@ -112,6 +112,10 @@
     color: white;
     position: relative;
     overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
   }
 
   .btn-primary::before {
@@ -122,6 +126,7 @@
     opacity: 0;
     transition: opacity 0.3s ease;
     border-radius: 50px;
+    pointer-events: none;
   }
 
   .btn-primary:hover::before {
@@ -145,6 +150,10 @@
     transition: all 0.3s ease;
     cursor: pointer;
     color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
   }
 
   .btn-secondary:hover {
