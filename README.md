@@ -1,4 +1,4 @@
-# 🤟 Sign Language AI Platform (Frontend)
+# 🤟 AI Sign Language learning and Assessment Platform (Frontend)
 
 A modern AI-powered Sign Language Learning Platform designed to help learners practice sign language through an interactive and responsive web interface.
 
