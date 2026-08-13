@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { evaluateAssessment } from '../api/api';
 
 import AssessmentHeader   from '../components/assessment/AssessmentHeader';
 import ReferenceGestureCard from '../components/assessment/ReferenceGestureCard';
@@ -89,19 +90,57 @@ export default function AssessmentPage() {
     return () => clearTimeout(timerRef.current);
   }, [timerActive, timeLeft]);
 
-  // ─── Simulate capture flow ────────────────────────────────────────────────
-  const simulateCapture = useCallback(() => {
+  // ─── Capture flow with Backend API + local fallback ──────────────────────────
+  const simulateCapture = useCallback(async () => {
     setCaptureState('recording');
     setSessionStatus('Recording');
-    setTimeout(() => {
+    setTimeout(async () => {
       setCaptureState('processing');
       setSessionStatus('Processing');
-      setTimeout(() => {
-        // Generate mock scores
+      try {
+        const apiRes = await evaluateAssessment({
+          user_id: 1,
+          gesture_name: currentGesture?.name || 'HELLO',
+          expected_sign: currentGesture?.name || 'HELLO'
+        });
+        const resScores = apiRes?.scores || {};
+        const newScores = {
+          overall:   apiRes?.overall_accuracy    || randomScore(),
+          handShape: resScores.hand_shape        || randomScore(),
+          motion:    resScores.motion            || randomScore(),
+          position:  resScores.position          || randomScore(),
+          timing:    resScores.timing            || randomScore(),
+        };
+        setScores(newScores);
+        setMistakes(apiRes?.mistakes || []);
+        setShowMistakes(true);
+
+        const overall = newScores.overall;
+        const passed  = apiRes?.passed !== undefined ? apiRes.passed : overall >= 70;
+        const result  = passed ? 'Pass' : 'Fail';
+        const col     = passed ? [34, 197, 94] : [239, 68, 68];
+
+        setHistory(prev => [
+          { id: Date.now(), gesture: currentGesture?.name || '-', accuracy: overall, attempt: 1, time: getTimestamp(), result, color: col },
+          ...prev.slice(0, 9),
+        ]);
+        setSummary(prev => ({
+          attempted:     prev.attempted + 1,
+          passed:        passed ? prev.passed + 1 : prev.passed,
+          failed:        !passed ? prev.failed + 1 : prev.failed,
+          avgAccuracy:   Math.round(((prev.avgAccuracy * prev.attempted + overall) / (prev.attempted + 1)) * 10) / 10,
+          bestScore:     Math.max(prev.bestScore, overall),
+          currentStreak: passed ? prev.currentStreak + 1 : 0,
+        }));
+
+        setCaptureState('done');
+        setSessionStatus('Ready');
+      } catch (err) {
+        console.warn("Backend assessment evaluation fallback:", err);
+        // Fallback: generate mock scores locally when backend is unavailable
         const newScores = {};
         ACCURACY_CATEGORIES.forEach(cat => { newScores[cat.key] = randomScore(); });
         setScores(newScores);
-        // Select random subset of mistakes (0-3)
         const numMistakes = Math.floor(Math.random() * 4);
         setMistakes(numMistakes === 0 ? [] : randomSubset(MISTAKE_TYPES, numMistakes));
         setShowMistakes(true);
@@ -111,12 +150,10 @@ export default function AssessmentPage() {
         const result  = passed ? 'Pass' : 'Fail';
         const col     = passed ? [34, 197, 94] : [239, 68, 68];
 
-        // Append to history
         setHistory(prev => [
           { id: Date.now(), gesture: currentGesture?.name || '-', accuracy: overall, attempt: 1, time: getTimestamp(), result, color: col },
           ...prev.slice(0, 9),
         ]);
-        // Update summary
         setSummary(prev => ({
           attempted: prev.attempted + 1,
           passed:    passed ? prev.passed + 1 : prev.passed,
@@ -128,7 +165,7 @@ export default function AssessmentPage() {
 
         setCaptureState('done');
         setSessionStatus('Ready');
-      }, 2000);
+      }
     }, 1500);
   }, [currentGesture]);
 

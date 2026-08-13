@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { predictGestureLandmarks, getModelsStatus } from '../api/api';
 import {
   CameraCard,
   RecognitionCard,
@@ -27,6 +28,146 @@ function getRandomConfidence(min = 70, max = 99) {
 }
 function getTimestamp() {
   return new Date().toLocaleTimeString('en-GB');
+}
+
+// ─── AI Model Selector Data ───────────────────────────────────────────────────
+const MODEL_OPTIONS = [
+  {
+    id: 'ensemble',
+    label: 'Ensemble',
+    description: 'Weighted 4-model vote',
+    color: [168, 85, 247],
+    icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z',
+  },
+  {
+    id: 'cnn',
+    label: 'CNN',
+    description: '1D Landmark Conv Network',
+    color: [59, 130, 246],
+    icon: 'M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18',
+  },
+  {
+    id: 'lstm',
+    label: 'LSTM',
+    description: 'Bidirectional RNN',
+    color: [16, 185, 129],
+    icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+  },
+  {
+    id: 'transformer',
+    label: 'Transformer',
+    description: 'Multi-Head Attention',
+    color: [245, 158, 11],
+    icon: 'M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z',
+  },
+  {
+    id: 'sklearn',
+    label: 'Scikit-Learn',
+    description: 'Random Forest Classifier',
+    color: [239, 68, 68],
+    icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
+  },
+];
+
+// ─── Model Selector Component ─────────────────────────────────────────────────
+function ModelSelector({ selected, onSelect, modelsStatus }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="glass-strong rounded-3xl p-5 flex flex-col gap-4 mb-8"
+      style={{ border: '1px solid rgba(255,255,255,0.08)' }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-0.5">
+          <h3 className="text-base font-space font-bold text-white">AI Recognition Engine</h3>
+          <p className="text-xs text-white/40">Select the active gesture recognition model</p>
+        </div>
+        {modelsStatus && (
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest"
+            style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            4 Engines Active
+          </div>
+        )}
+      </div>
+
+      {/* Model Pills */}
+      <div className="flex flex-wrap gap-2">
+        {MODEL_OPTIONS.map((opt) => {
+          const [r, g, b] = opt.color;
+          const isActive = selected === opt.id;
+          return (
+            <motion.button
+              key={opt.id}
+              id={`model-selector-${opt.id}`}
+              onClick={() => onSelect(opt.id)}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 relative overflow-hidden"
+              style={{
+                background: isActive ? `rgba(${r},${g},${b},0.2)` : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${isActive ? `rgba(${r},${g},${b},0.6)` : 'rgba(255,255,255,0.08)'}`,
+                color: isActive ? `rgb(${r},${g},${b})` : 'rgba(255,255,255,0.55)',
+                boxShadow: isActive ? `0 0 20px rgba(${r},${g},${b},0.25), inset 0 1px 0 rgba(${r},${g},${b},0.1)` : 'none',
+              }}
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="model-active-bg"
+                  className="absolute inset-0 rounded-xl pointer-events-none"
+                  style={{ background: `radial-gradient(ellipse at center, rgba(${r},${g},${b},0.12) 0%, transparent 70%)` }}
+                />
+              )}
+              <div className="w-5 h-5 relative z-10">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={opt.icon} />
+                </svg>
+              </div>
+              <span className="relative z-10">{opt.label}</span>
+              {isActive && (
+                <span className="relative z-10 text-[9px] font-black uppercase tracking-widest ml-0.5"
+                  style={{ color: `rgba(${r},${g},${b},0.8)` }}
+                >
+                  Active
+                </span>
+              )}
+            </motion.button>
+          );
+        })}
+      </div>
+
+      {/* Active model description */}
+      <AnimatePresence mode="wait">
+        {MODEL_OPTIONS.filter(m => m.id === selected).map((opt) => {
+          const [r, g, b] = opt.color;
+          return (
+            <motion.div
+              key={opt.id}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="flex items-center gap-3 rounded-2xl px-4 py-2.5 overflow-hidden"
+              style={{ background: `rgba(${r},${g},${b},0.07)`, border: `1px solid rgba(${r},${g},${b},0.2)` }}
+            >
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke={`rgb(${r},${g},${b})`} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={opt.icon} />
+              </svg>
+              <div className="flex flex-col">
+                <span className="text-xs font-semibold" style={{ color: `rgb(${r},${g},${b})` }}>{opt.label} — {opt.description}</span>
+                {modelsStatus?.[opt.id] && (
+                  <span className="text-[10px] text-white/40">{modelsStatus[opt.id]?.architecture ?? ''}</span>
+                )}
+              </div>
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
+    </motion.div>
+  );
 }
 
 // ─── Page Header ─────────────────────────────────────────────────────────────
@@ -148,21 +289,48 @@ export default function GestureRecognitionPage() {
   const [stats, setStats] = useState(SESSION_STATS_INITIAL);
   const [sessionStatus, setSessionStatus] = useState('System Ready');
   const [simulatingAuto, setSimulatingAuto] = useState(false);
+  // ─── Backend integration state ──────────────────────────────────────────────
+  const [selectedModel, setSelectedModel] = useState('ensemble');
+  const [modelsStatus, setModelsStatus] = useState(null);
+  const [activeArchitecture, setActiveArchitecture] = useState('Multi-Model Ensemble');
 
-  // Simulate a recognition event
-  const simulateRecognition = useCallback((gesture) => {
+  // Fetch live model status from backend on mount
+  useEffect(() => {
+    getModelsStatus()
+      .then(status => setModelsStatus(status))
+      .catch(() => setModelsStatus(null));
+  }, []);
+
+  // Update architecture label whenever selected model changes
+  useEffect(() => {
+    const opt = MODEL_OPTIONS.find(m => m.id === selectedModel);
+    setActiveArchitecture(opt?.description || 'Multi-Model Ensemble');
+  }, [selectedModel]);
+
+  // Simulate / backend-powered recognition event
+  const simulateRecognition = useCallback(async (gesture) => {
     const target = gesture || getRandomGesture();
     setRecognitionStatus('processing');
-    setTimeout(() => {
-      const conf = getRandomConfidence();
-      setCurrentGesture(target);
+
+    try {
+      // Call backend recognition API with the selected model
+      const apiRes = await predictGestureLandmarks(HAND_LANDMARKS, target.name, selectedModel);
+      const conf = apiRes?.confidence ? Number(apiRes.confidence) : getRandomConfidence();
+      const recSign = apiRes?.recognized_sign || target.name;
+      // Update active architecture label from response
+      if (apiRes?.architecture) setActiveArchitecture(apiRes.architecture);
+
+      // Find matching gesture from library or use target
+      const matched = GESTURES.find(g => g.name.toUpperCase() === recSign.toUpperCase()) || target;
+
+      setCurrentGesture(matched);
       setConfidence(conf);
       setTimestamp(getTimestamp());
       setRecognitionStatus(conf > 80 ? 'Recognized' : conf > 60 ? 'Partial Match' : 'Low Confidence');
-      // Append to history
+
       const result = conf > 80 ? 'Correct' : conf > 60 ? 'Partial' : 'Incorrect';
       const col = conf > 80 ? [34, 197, 94] : conf > 60 ? [245, 158, 11] : [239, 68, 68];
-      setHistory(prev => [{ id: Date.now(), time: getTimestamp(), gesture: target.name, confidence: conf, result, color: col }, ...prev.slice(0, 9)]);
+      setHistory(prev => [{ id: Date.now(), time: getTimestamp(), gesture: matched.name, confidence: conf, result, color: col }, ...prev.slice(0, 9)]);
       setStats(prev => ({
         ...prev,
         recognized: prev.recognized + 1,
@@ -170,8 +338,19 @@ export default function GestureRecognitionPage() {
         successful: conf > 80 ? prev.successful + 1 : prev.successful,
         avgAccuracy: Math.round(((prev.avgAccuracy * prev.attempts + conf) / (prev.attempts + 1)) * 10) / 10,
       }));
-    }, 1200);
-  }, []);
+    } catch (err) {
+      console.warn("Backend recognition fallback:", err);
+      // Fallback to local simulation when backend is unavailable
+      const conf = getRandomConfidence();
+      setCurrentGesture(target);
+      setConfidence(conf);
+      setTimestamp(getTimestamp());
+      setRecognitionStatus(conf > 80 ? 'Recognized' : conf > 60 ? 'Partial Match' : 'Low Confidence');
+      const result = conf > 80 ? 'Correct' : conf > 60 ? 'Partial' : 'Incorrect';
+      const col = conf > 80 ? [34, 197, 94] : conf > 60 ? [245, 158, 11] : [239, 68, 68];
+      setHistory(prev => [{ id: Date.now(), time: getTimestamp(), gesture: target.name, confidence: conf, result, color: col }, ...prev.slice(0, 9)]);
+    }
+  }, [selectedModel]);
 
   // Auto-simulate when camera is active
   useEffect(() => {
@@ -181,14 +360,48 @@ export default function GestureRecognitionPage() {
     }
   }, [cameraState, simulatingAuto, simulateRecognition]);
 
+  // Handle real-time camera stream results from CameraCard
+  const handleRealtimeResult = useCallback((res) => {
+    if (!res || !res.recognized_sign) return;
+    const recSign = res.recognized_sign;
+    const conf = res.confidence ? Number(res.confidence) : getRandomConfidence();
+    const matched = GESTURES.find(g => g.name.toUpperCase() === recSign.toUpperCase()) || {
+      id: recSign,
+      name: recSign,
+      asl: `ASL Sign: ${recSign}`,
+      emoji: '✋',
+      color: [139, 92, 246],
+      category: 'Realtime',
+      difficulty: 'Beginner',
+      meaning: `Recognized ${recSign} sign in real-time camera stream.`,
+      description: 'Hand gesture captured live from user camera.',
+      commonUsage: 'Live practice',
+      tips: ['Keep your hand steady in center of frame for maximum clarity.']
+    };
+
+    setCurrentGesture(matched);
+    setConfidence(conf);
+    setTimestamp(getTimestamp());
+    setRecognitionStatus(conf > 80 ? 'Recognized Live' : conf > 60 ? 'Partial Match' : 'Low Confidence');
+
+    const result = conf > 80 ? 'Correct' : conf > 60 ? 'Partial' : 'Incorrect';
+    const col = conf > 80 ? [34, 197, 94] : conf > 60 ? [245, 158, 11] : [239, 68, 68];
+    setHistory(prev => {
+      if (prev.length > 0 && prev[0].gesture === matched.name && Math.abs(prev[0].confidence - conf) < 1) {
+        return prev;
+      }
+      return [{ id: Date.now(), time: getTimestamp(), gesture: matched.name, confidence: conf, result, color: col }, ...prev.slice(0, 9)];
+    });
+  }, []);
+
   const handleStartCamera = () => {
     setCameraState('loading');
-    setSessionStatus('Initializing...');
+    setSessionStatus('Initializing Camera...');
     setTimeout(() => {
       setCameraState('active');
-      setSessionStatus('Session Active');
-      setSimulatingAuto(true);
-    }, 2000);
+      setSessionStatus('Live Camera Stream Active');
+      setSimulatingAuto(false);
+    }, 1500);
   };
 
   const handleStopCamera = () => {
@@ -227,6 +440,13 @@ export default function GestureRecognitionPage() {
         {/* Header */}
         <PageHeader sessionStatus={sessionStatus} />
 
+        {/* AI Model Selector */}
+        <ModelSelector
+          selected={selectedModel}
+          onSelect={setSelectedModel}
+          modelsStatus={modelsStatus}
+        />
+
         {/* Session Statistics */}
         <div className="mb-8">
           <SessionStats stats={stats} />
@@ -242,6 +462,7 @@ export default function GestureRecognitionPage() {
               onStop={handleStopCamera}
               onCapture={handleCapture}
               onSwitch={handleSwitch}
+              onRealtimeResult={handleRealtimeResult}
             />
             <GestureSelector
               gestures={GESTURES}
