@@ -4,13 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout, { AuthInput } from '../layouts/AuthLayout';
 import { useAuth } from '../context/AuthContext';
 
-/* ══════════════════════════════════════════════════════════════════
-   MINI CANVAS — Left-side decorative hand illustration
-   Same visual language as HeroSection's HandVisual, slightly smaller
-══════════════════════════════════════════════════════════════════ */
-
-
-
 function LoginIllustration() {
   const canvasRef = useRef(null);
 
@@ -23,14 +16,13 @@ function LoginIllustration() {
     canvas.width = 420;
     canvas.height = 480;
 
-    // ILY hand sign landmark positions
     const lm = [
-      { x: 0.50, y: 0.88 }, // wrist
-      { x: 0.34, y: 0.76 }, { x: 0.26, y: 0.65 }, { x: 0.21, y: 0.54 }, { x: 0.17, y: 0.43 }, // thumb
-      { x: 0.36, y: 0.62 }, { x: 0.30, y: 0.42 }, { x: 0.28, y: 0.26 }, { x: 0.27, y: 0.12 }, // index
-      { x: 0.49, y: 0.60 }, { x: 0.49, y: 0.49 }, { x: 0.49, y: 0.43 }, { x: 0.49, y: 0.39 }, // mid (curled)
-      { x: 0.61, y: 0.61 }, { x: 0.63, y: 0.50 }, { x: 0.63, y: 0.44 }, { x: 0.63, y: 0.40 }, // ring (curled)
-      { x: 0.73, y: 0.65 }, { x: 0.77, y: 0.47 }, { x: 0.78, y: 0.33 }, { x: 0.79, y: 0.21 }, // pinky
+      { x: 0.50, y: 0.88 },
+      { x: 0.34, y: 0.76 }, { x: 0.26, y: 0.65 }, { x: 0.21, y: 0.54 }, { x: 0.17, y: 0.43 },
+      { x: 0.36, y: 0.62 }, { x: 0.30, y: 0.42 }, { x: 0.28, y: 0.26 }, { x: 0.27, y: 0.12 },
+      { x: 0.49, y: 0.60 }, { x: 0.49, y: 0.49 }, { x: 0.49, y: 0.43 }, { x: 0.49, y: 0.39 },
+      { x: 0.61, y: 0.61 }, { x: 0.63, y: 0.50 }, { x: 0.63, y: 0.44 }, { x: 0.63, y: 0.40 },
+      { x: 0.73, y: 0.65 }, { x: 0.77, y: 0.47 }, { x: 0.78, y: 0.33 }, { x: 0.79, y: 0.21 },
     ];
     const conns = [
       [0,1],[1,2],[2,3],[3,4],
@@ -51,13 +43,11 @@ function LoginIllustration() {
       const wy = Math.cos(t * 0.016) * 7;
       const pulse = 0.75 + 0.25 * Math.sin(t * 0.04);
 
-      // Central glow
       const bg = ctx.createRadialGradient(canvas.width/2, canvas.height*0.5, 0, canvas.width/2, canvas.height*0.5, 210);
       bg.addColorStop(0, 'rgba(139,92,246,0.07)');
       bg.addColorStop(1, 'transparent');
       ctx.fillStyle = bg; ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Orbit rings
       const cx = canvas.width/2, cy = canvas.height*0.52;
       [130, 185, 232].forEach((r, i) => {
         ctx.beginPath();
@@ -65,7 +55,6 @@ function LoginIllustration() {
         ctx.strokeStyle = `rgba(139,92,246,${0.05 + i*0.015})`;
         ctx.lineWidth = 1; ctx.stroke();
       });
-      // Orbiting dots
       [[185, 0.022, [236,72,153], 4], [232, -0.016, [59,130,246], 3], [130, 0.031, [168,85,247], 3]].forEach(([r,sp,col,sz]) => {
         const a = t*sp; const ox = cx+Math.cos(a)*r; const oy = cy+Math.sin(a)*r*0.3-15;
         const dg = ctx.createRadialGradient(ox,oy,0,ox,oy,sz+5);
@@ -76,14 +65,12 @@ function LoginIllustration() {
         ctx.fill(); ctx.shadowBlur=0;
       });
 
-      // Scan line
       const prog = ((t*0.55)%100)/100;
       const sy = canvas.height*0.16 + canvas.height*0.70*prog;
       const sg = ctx.createLinearGradient(0,sy-4,0,sy+4);
       sg.addColorStop(0,'transparent'); sg.addColorStop(0.5,`rgba(99,102,241,${0.28*(1-Math.abs(prog-0.5)*2)})`); sg.addColorStop(1,'transparent');
       ctx.fillStyle=sg; ctx.fillRect(canvas.width*0.12, sy-4, canvas.width*0.76, 8);
 
-      // Connections
       conns.forEach(([a,b]) => {
         const pa = pos(lm[a],wx,wy), pb = pos(lm[b],wx,wy);
         const g = ctx.createLinearGradient(pa.x,pa.y,pb.x,pb.y);
@@ -95,7 +82,6 @@ function LoginIllustration() {
         ctx.moveTo(pa.x,pa.y); ctx.lineTo(pb.x,pb.y); ctx.stroke(); ctx.shadowBlur=0;
       });
 
-      // Nodes
       lm.forEach((p, i) => {
         const {x,y} = pos(p,wx,wy);
         const isTip=[4,8,12,16,20].includes(i);
@@ -113,7 +99,6 @@ function LoginIllustration() {
         ctx.fillStyle=`rgba(255,255,255,${0.8*pulse})`; ctx.fill();
       });
 
-      // Floating stat chips
       const chips = [
         { lx:30, ly:70, label:'AI Score', val:'94%', col:[168,85,247] },
         { lx:canvas.width-115, ly:105, label:'Signs Learned', val:'142', col:[59,130,246] },
@@ -131,7 +116,6 @@ function LoginIllustration() {
         ctx.fillText(c.val, c.lx+10, fy+32);
       });
 
-      // Corner brackets
       const m=22,s=16;
       [[m,m,1,1],[canvas.width-m,m,-1,1],[m,canvas.height-m,1,-1],[canvas.width-m,canvas.height-m,-1,-1]].forEach(([bx,by,xd,yd])=>{
         ctx.strokeStyle='rgba(139,92,246,0.4)'; ctx.lineWidth=1.5;
@@ -161,18 +145,15 @@ function LoginIllustration() {
   );
 }
 
-
-/* ══════════════════════════════════════════════════════════════════
-   OAUTH BUTTON — same glass style as btn-secondary
-══════════════════════════════════════════════════════════════════ */
-
-function OAuthBtn({ id, icon, label }) {
+function OAuthBtn({ id, icon, label, onClick }) {
   return (
     <motion.button
+      type="button"
       id={id}
+      onClick={onClick}
       whileHover={{ scale: 1.02, backgroundColor: 'rgba(255,255,255,0.08)' }}
       whileTap={{ scale: 0.98 }}
-      className="w-full flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200"
+      className="w-full flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer"
       style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', color: 'rgba(255,255,255,0.72)' }}
     >
       {icon}<span>{label}</span>
@@ -200,9 +181,6 @@ const AppleIcon = () => (
   </svg>
 );
 
-/* ══════════════════════════════════════════════════════════════════
-   LOGIN PAGE — content only (App.jsx provides Navbar + Footer)
-══════════════════════════════════════════════════════════════════ */
 export default function LoginPage() {
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
@@ -210,17 +188,16 @@ export default function LoginPage() {
   const [remember, setRemember] = useState(false);
   const [loading, setLoading]   = useState(false);
   const [success, setSuccess]   = useState(false);
+  const [oauthModal, setOauthModal] = useState(null); // 'Google' | 'Microsoft' | 'Apple'
+  const [accountEmail, setAccountEmail] = useState('user@gmail.com');
   const navigate                = useNavigate();
   const { login }               = useAuth();
 
   useEffect(() => {
     if (!success) return;
-
     const timer = setTimeout(() => {
-      // Navigate to Role Selection
       navigate('/select-role');
     }, 1500);
-
     return () => clearTimeout(timer);
   }, [success, navigate]);
 
@@ -229,14 +206,22 @@ export default function LoginPage() {
     if (!email || !password) return;
     setLoading(true);
     setTimeout(() => {
-      // Call AuthContext login()
       login({ email, name: email.split('@')[0] });
       setLoading(false);
       setSuccess(true);
     }, 2000);
   };
 
-
+  const handleOAuthAuthorize = () => {
+    const providerName = oauthModal;
+    setOauthModal(null);
+    setLoading(true);
+    setTimeout(() => {
+      login({ email: accountEmail, name: accountEmail.split('@')[0], provider: providerName });
+      setLoading(false);
+      setSuccess(true);
+    }, 1500);
+  };
 
   return (
     <AuthLayout
@@ -249,7 +234,7 @@ export default function LoginPage() {
       title="Welcome Back"
       subtitle="Sign in to continue learning."
       badges={[
-        { icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', label: 'Secure Login', color: [34, 197, 94] },
+        { icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', label: 'Secure OAuth 2.0 SSL', color: [34, 197, 94] },
         { icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', label: 'Accessibility Supported', color: [59, 130, 246] },
       ]}
     >
@@ -319,8 +304,6 @@ export default function LoginPage() {
                 to="/forgot-password"
                 className="text-sm font-medium transition-colors duration-200"
                 style={{ color: 'rgba(168,85,247,0.8)' }}
-                onMouseEnter={e => e.target.style.color = 'rgba(168,85,247,1)'}
-                onMouseLeave={e => e.target.style.color = 'rgba(168,85,247,0.8)'}
               >
                 Forgot Password?
               </Link>
@@ -359,12 +342,12 @@ export default function LoginPage() {
               <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
             </div>
 
-            {/* OAuth */}
+            {/* OAuth buttons with permission triggers */}
             <div className="flex flex-col gap-2.5">
-              <OAuthBtn id="google-btn" icon={<GoogleIcon />} label="Continue with Google" />
+              <OAuthBtn id="google-btn" onClick={() => { setAccountEmail('alex.morgan@gmail.com'); setOauthModal('Google'); }} icon={<GoogleIcon />} label="Continue with Google" />
               <div className="grid grid-cols-2 gap-2.5">
-                <OAuthBtn id="ms-btn" icon={<MsIcon />} label="Microsoft" />
-                <OAuthBtn id="apple-btn" icon={<AppleIcon />} label="Apple" />
+                <OAuthBtn id="ms-btn" onClick={() => { setAccountEmail('alex.morgan@outlook.com'); setOauthModal('Microsoft'); }} icon={<MsIcon />} label="Microsoft" />
+                <OAuthBtn id="apple-btn" onClick={() => { setAccountEmail('alex.morgan@icloud.com'); setOauthModal('Apple'); }} icon={<AppleIcon />} label="Apple" />
               </div>
             </div>
 
@@ -375,8 +358,6 @@ export default function LoginPage() {
                 to="/register"
                 className="font-semibold transition-colors duration-200"
                 style={{ color: 'rgba(168,85,247,0.85)' }}
-                onMouseEnter={e => e.target.style.color = 'rgba(168,85,247,1)'}
-                onMouseLeave={e => e.target.style.color = 'rgba(168,85,247,0.85)'}
               >
                 Create Account
               </Link>
@@ -411,7 +392,92 @@ export default function LoginPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* OAuth Account Permission & Consent Modal */}
+      <AnimatePresence>
+        {oauthModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setOauthModal(null)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 15 }}
+              className="relative z-10 w-full max-w-md glass-strong rounded-3xl p-7 flex flex-col gap-5 text-left border border-purple-500/30"
+              style={{ boxShadow: '0 24px 60px rgba(0,0,0,0.8)' }}
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                <div className="flex items-center gap-2.5">
+                  {oauthModal === 'Google' && <GoogleIcon />}
+                  {oauthModal === 'Microsoft' && <MsIcon />}
+                  {oauthModal === 'Apple' && <AppleIcon />}
+                  <span className="font-semibold text-white text-base">Sign in with {oauthModal}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setOauthModal(null)}
+                  className="text-white/40 hover:text-white text-xs px-2 py-1 rounded-lg hover:bg-white/10"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <span className="text-xs text-white/50">Choose account to authorize:</span>
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center font-bold text-white text-sm">
+                    {accountEmail.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex flex-col overflow-hidden">
+                    <span className="text-sm font-semibold text-white truncate">{accountEmail.split('@')[0]}</span>
+                    <input
+                      type="email"
+                      value={accountEmail}
+                      onChange={(e) => setAccountEmail(e.target.value)}
+                      className="text-xs text-purple-300 bg-transparent border-none focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2 text-xs text-white/70 bg-purple-900/20 p-3.5 rounded-xl border border-purple-500/20">
+                <span className="font-semibold text-purple-300">Sign Language AI requests permissions:</span>
+                <ul className="flex flex-col gap-1.5 text-white/60 ml-2">
+                  <li className="flex items-center gap-2">✔ Read your primary email address (<code className="text-purple-300">email</code>)</li>
+                  <li className="flex items-center gap-2">✔ Access profile information & avatar (<code className="text-purple-300">profile</code>)</li>
+                  <li className="flex items-center gap-2">✔ Verify identity token (<code className="text-purple-300">openid</code>)</li>
+                </ul>
+              </div>
+
+              <p className="text-[11px] text-white/40 leading-relaxed">
+                By continuing, {oauthModal} will share your name and email with Sign Language AI in accordance with their privacy policies.
+              </p>
+
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setOauthModal(null)}
+                  className="flex-1 py-2.5 rounded-xl border border-white/15 text-xs text-white/70 hover:bg-white/10 font-semibold transition-all"
+                >
+                  Deny / Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleOAuthAuthorize}
+                  className="flex-1 py-2.5 rounded-xl btn-primary text-xs font-bold text-white transition-all"
+                >
+                  Allow & Authorize
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </AuthLayout>
   );
 }
-

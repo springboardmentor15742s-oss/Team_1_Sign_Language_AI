@@ -90,7 +90,7 @@ export default function AssessmentPage() {
     return () => clearTimeout(timerRef.current);
   }, [timerActive, timeLeft]);
 
-  // ─── Capture flow with Backend API + local fallback ──────────────────────────
+  // ─── Simulate capture flow with Backend API ───────────────────────────────
   const simulateCapture = useCallback(async () => {
     setCaptureState('recording');
     setSessionStatus('Recording');
@@ -105,31 +105,31 @@ export default function AssessmentPage() {
         });
         const resScores = apiRes?.scores || {};
         const newScores = {
-          overall:   apiRes?.overall_accuracy    || randomScore(),
-          handShape: resScores.hand_shape        || randomScore(),
-          motion:    resScores.motion            || randomScore(),
-          position:  resScores.position          || randomScore(),
-          timing:    resScores.timing            || randomScore(),
+          overall: apiRes?.overall_accuracy || randomScore(),
+          handShape: resScores.hand_shape || randomScore(),
+          motion: resScores.motion || randomScore(),
+          position: resScores.position || randomScore(),
+          timing: resScores.timing || randomScore(),
         };
         setScores(newScores);
         setMistakes(apiRes?.mistakes || []);
         setShowMistakes(true);
 
         const overall = newScores.overall;
-        const passed  = apiRes?.passed !== undefined ? apiRes.passed : overall >= 70;
-        const result  = passed ? 'Pass' : 'Fail';
-        const col     = passed ? [34, 197, 94] : [239, 68, 68];
+        const passed = apiRes?.passed !== undefined ? apiRes.passed : overall >= 70;
+        const result = passed ? 'Pass' : 'Fail';
+        const col = passed ? [34, 197, 94] : [239, 68, 68];
 
         setHistory(prev => [
           { id: Date.now(), gesture: currentGesture?.name || '-', accuracy: overall, attempt: 1, time: getTimestamp(), result, color: col },
           ...prev.slice(0, 9),
         ]);
         setSummary(prev => ({
-          attempted:     prev.attempted + 1,
-          passed:        passed ? prev.passed + 1 : prev.passed,
-          failed:        !passed ? prev.failed + 1 : prev.failed,
-          avgAccuracy:   Math.round(((prev.avgAccuracy * prev.attempted + overall) / (prev.attempted + 1)) * 10) / 10,
-          bestScore:     Math.max(prev.bestScore, overall),
+          attempted: prev.attempted + 1,
+          passed: passed ? prev.passed + 1 : prev.passed,
+          failed: !passed ? prev.failed + 1 : prev.failed,
+          avgAccuracy: Math.round(((prev.avgAccuracy * prev.attempted + overall) / (prev.attempted + 1)) * 10) / 10,
+          bestScore: Math.max(prev.bestScore, overall),
           currentStreak: passed ? prev.currentStreak + 1 : 0,
         }));
 
@@ -137,7 +137,6 @@ export default function AssessmentPage() {
         setSessionStatus('Ready');
       } catch (err) {
         console.warn("Backend assessment evaluation fallback:", err);
-        // Fallback: generate mock scores locally when backend is unavailable
         const newScores = {};
         ACCURACY_CATEGORIES.forEach(cat => { newScores[cat.key] = randomScore(); });
         setScores(newScores);
@@ -146,28 +145,20 @@ export default function AssessmentPage() {
         setShowMistakes(true);
 
         const overall = newScores['overall'] || randomScore();
-        const passed  = overall >= 70;
-        const result  = passed ? 'Pass' : 'Fail';
-        const col     = passed ? [34, 197, 94] : [239, 68, 68];
+        const passed = overall >= 70;
+        const result = passed ? 'Pass' : 'Fail';
+        const col = passed ? [34, 197, 94] : [239, 68, 68];
 
         setHistory(prev => [
           { id: Date.now(), gesture: currentGesture?.name || '-', accuracy: overall, attempt: 1, time: getTimestamp(), result, color: col },
           ...prev.slice(0, 9),
         ]);
-        setSummary(prev => ({
-          attempted: prev.attempted + 1,
-          passed:    passed ? prev.passed + 1 : prev.passed,
-          failed:    !passed ? prev.failed + 1 : prev.failed,
-          avgAccuracy: Math.round(((prev.avgAccuracy * prev.attempted + overall) / (prev.attempted + 1)) * 10) / 10,
-          bestScore:  Math.max(prev.bestScore, overall),
-          currentStreak: passed ? prev.currentStreak + 1 : 0,
-        }));
-
         setCaptureState('done');
         setSessionStatus('Ready');
       }
     }, 1500);
   }, [currentGesture]);
+
 
   const handleStart = () => {
     setCaptureState('ready');

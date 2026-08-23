@@ -1,8 +1,13 @@
 // src/components/assessment/AssessmentCamera.jsx
 import { motion } from 'framer-motion';
+import { useRef, useEffect, useState } from 'react';
 
 // captureState: 'idle' | 'ready' | 'recording' | 'processing' | 'done'
 export default function AssessmentCamera({ captureState, onStart, onCapture, onRetry, onSkip, onNext, canGoNext }) {
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const [cameraError, setCameraError] = useState(null);
+
   const stateConfig = {
     idle:       { label: 'Assessment Not Started', sublabel: 'Click "Start Assessment" to begin', ringColor: 'rgba(139,92,246,0.4)', gridColor: 'rgba(139,92,246,0.15)', emoji: '🎯' },
     ready:      { label: 'Ready to Capture',        sublabel: 'Position your hand and click Capture',    ringColor: 'rgba(34,197,94,0.5)',   gridColor: 'rgba(34,197,94,0.08)',  emoji: '✋' },
@@ -13,15 +18,60 @@ export default function AssessmentCamera({ captureState, onStart, onCapture, onR
   const cfg = stateConfig[captureState] || stateConfig['idle'];
   const isActive = captureState !== 'idle';
 
+  useEffect(() => {
+    async function startWebcam() {
+      if (isActive) {
+        setCameraError(null);
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
+            audio: false
+          });
+          streamRef.current = stream;
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+            await videoRef.current.play();
+          }
+        } catch (err) {
+          console.warn("Assessment webcam access error:", err);
+          setCameraError("Camera access denied or unavailable.");
+        }
+      } else {
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop());
+          streamRef.current = null;
+        }
+      }
+    }
+    startWebcam();
+
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [isActive]);
+
   return (
     <div className="glass-strong rounded-3xl overflow-hidden flex flex-col"
       style={{ border: '1px solid rgba(255,255,255,0.08)' }}
     >
       {/* Viewport */}
-      <div className="relative bg-[#050510]" style={{ aspectRatio: '4/3', minHeight: 240 }}>
-        {/* Grid */}
+      <div className="relative bg-[#050510] overflow-hidden flex items-center justify-center" style={{ aspectRatio: '4/3', minHeight: 240 }}>
+        {/* Live HTML5 Video Tag */}
         {isActive && (
-          <div className="absolute inset-0"
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className={`absolute inset-0 w-full h-full object-cover transform -scale-x-100 ${cameraError ? 'hidden' : 'block'}`}
+          />
+        )}
+
+        {/* Grid Overlay */}
+        {isActive && (
+          <div className="absolute inset-0 pointer-events-none"
             style={{
               backgroundImage: `linear-gradient(${cfg.gridColor} 1px, transparent 1px), linear-gradient(90deg, ${cfg.gridColor} 1px, transparent 1px)`,
               backgroundSize: '32px 32px',
@@ -30,7 +80,7 @@ export default function AssessmentCamera({ captureState, onStart, onCapture, onR
         )}
 
         {/* Content */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10">
           {/* Animated ring */}
           <div className="relative flex items-center justify-center">
             <motion.div
@@ -42,23 +92,23 @@ export default function AssessmentCamera({ captureState, onStart, onCapture, onR
             <motion.div
               animate={captureState === 'processing' ? { rotate: 360 } : { scale: [0.97, 1.03, 0.97] }}
               transition={{ duration: captureState === 'processing' ? 1 : 2, repeat: Infinity, ease: captureState === 'processing' ? 'linear' : 'easeInOut' }}
-              className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl"
-              style={{ background: 'rgba(0,0,0,0.4)', border: `1px solid ${cfg.ringColor}` }}
+              className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl shadow-xl backdrop-blur-md"
+              style={{ background: 'rgba(0,0,0,0.5)', border: `1px solid ${cfg.ringColor}` }}
             >
               {cfg.emoji}
             </motion.div>
           </div>
 
-          <div className="text-center">
+          <div className="text-center px-4 py-1.5 rounded-xl bg-black/60 backdrop-blur-md border border-white/10">
             <p className="text-white text-sm font-semibold">{cfg.label}</p>
-            <p className="text-white/40 text-xs mt-0.5">{cfg.sublabel}</p>
+            <p className="text-white/60 text-xs mt-0.5">{cfg.sublabel}</p>
           </div>
 
           {/* Live indicator */}
           {captureState === 'recording' && (
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/50 border border-red-500/30">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/70 border border-red-500/40">
               <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
-              <span className="text-red-400 text-[10px] font-bold tracking-widest uppercase">Recording</span>
+              <span className="text-red-400 text-[10px] font-bold tracking-widest uppercase">Recording Live</span>
             </div>
           )}
         </div>
@@ -68,7 +118,7 @@ export default function AssessmentCamera({ captureState, onStart, onCapture, onR
           <motion.div
             animate={{ top: ['5%', '95%', '5%'] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-            className="absolute left-0 right-0 h-px pointer-events-none"
+            className="absolute left-0 right-0 h-px pointer-events-none z-10"
             style={{ background: 'linear-gradient(90deg, transparent, rgba(239,68,68,0.7), transparent)' }}
           />
         )}
@@ -82,11 +132,12 @@ export default function AssessmentCamera({ captureState, onStart, onCapture, onR
               'bottom-3 left-3 border-b-2 border-l-2',
               'bottom-3 right-3 border-b-2 border-r-2',
             ].map((cls, i) => (
-              <div key={i} className={`absolute w-6 h-6 ${cls}`} style={{ borderColor: cfg.ringColor }} />
+              <div key={i} className={`absolute w-6 h-6 pointer-events-none z-10 ${cls}`} style={{ borderColor: cfg.ringColor }} />
             ))}
           </>
         )}
       </div>
+
 
       {/* Controls */}
       <AssessmentControls

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../layouts/DashboardLayout';
+import { getAccuracyEvaluation } from '../../api/api';
 
 // Mock Data
 import {
@@ -26,6 +27,31 @@ import AccuracyHistoryTable from '../../components/accuracy/AccuracyHistoryTable
 export default function AccuracyDashboardPage() {
   const navigate = useNavigate();
   const [exportedNotice, setExportedNotice] = useState(null);
+  const [evalSummary, setEvalSummary] = useState(OVERALL_ACCURACY_SUMMARY);
+
+  useEffect(() => {
+    async function fetchAccuracy() {
+      try {
+        const res = await getAccuracyEvaluation(1);
+        if (res && res.overall_accuracy !== undefined) {
+          setEvalSummary({
+            overallAccuracy: res.overall_accuracy,
+            performanceGrade: res.performance_grade || 'Advanced',
+            status: res.status || 'Consistent Mastery',
+            improvementStreak: res.improvement_streak || '7-Day Active Streak',
+            handShapeAccuracy: res.hand_shape_accuracy || 94.2,
+            motionAccuracy: res.motion_accuracy || 88.7,
+            positionAccuracy: res.position_accuracy || 92.1,
+            timingAccuracy: res.timing_accuracy || 89.5,
+            gestureConfidence: res.gesture_confidence || 95.8,
+          });
+        }
+      } catch (err) {
+        console.warn("Backend evaluation fetch fallback:", err);
+      }
+    }
+    fetchAccuracy();
+  }, []);
 
   const handleExport = () => {
     setExportedNotice('Full Accuracy Assessment Report exported (PDF format).');
@@ -56,10 +82,10 @@ export default function AccuracyDashboardPage() {
 
         {/* Top Header */}
         <AccuracyHeader
-          overallScore={OVERALL_ACCURACY_SUMMARY.overallAccuracy}
-          grade={OVERALL_ACCURACY_SUMMARY.performanceGrade}
-          status={OVERALL_ACCURACY_SUMMARY.status}
-          streak={OVERALL_ACCURACY_SUMMARY.improvementStreak}
+          overallScore={evalSummary.overallAccuracy}
+          grade={evalSummary.performanceGrade}
+          status={evalSummary.status}
+          streak={evalSummary.improvementStreak}
           onExport={handleExport}
           onHistoryClick={() => navigate('/accuracy/history')}
         />
@@ -68,7 +94,7 @@ export default function AccuracyDashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
           <AccuracyCard
             title="Overall Sign Accuracy"
-            value={`${OVERALL_ACCURACY_SUMMARY.overallAccuracy}%`}
+            value={`${evalSummary.overallAccuracy}%`}
             change="+2.4% vs last wk"
             color={[168, 85, 247]}
             icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
@@ -76,7 +102,7 @@ export default function AccuracyDashboardPage() {
           />
           <AccuracyCard
             title="Hand Shape Accuracy"
-            value={`${OVERALL_ACCURACY_SUMMARY.handShapeAccuracy}%`}
+            value={`${evalSummary.handShapeAccuracy}%`}
             change="Grade A+"
             color={[59, 130, 246]}
             icon="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5a1.5 1.5 0 013 0v4.5"
@@ -84,7 +110,7 @@ export default function AccuracyDashboardPage() {
           />
           <AccuracyCard
             title="Motion Accuracy"
-            value={`${OVERALL_ACCURACY_SUMMARY.motionAccuracy}%`}
+            value={`${evalSummary.motionAccuracy}%`}
             change="Smooth Trajectory"
             color={[245, 158, 11]}
             icon="M13 10V3L4 14h7v7l9-11h-7z"
@@ -92,7 +118,7 @@ export default function AccuracyDashboardPage() {
           />
           <AccuracyCard
             title="Position Accuracy"
-            value={`${OVERALL_ACCURACY_SUMMARY.positionAccuracy}%`}
+            value={`${evalSummary.positionAccuracy}%`}
             change="High Precision"
             color={[34, 197, 94]}
             icon="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
@@ -100,7 +126,7 @@ export default function AccuracyDashboardPage() {
           />
           <AccuracyCard
             title="Timing Accuracy"
-            value={`${OVERALL_ACCURACY_SUMMARY.timingAccuracy}%`}
+            value={`${evalSummary.timingAccuracy}%`}
             change="Paced Well"
             color={[236, 72, 153]}
             icon="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
@@ -108,13 +134,14 @@ export default function AccuracyDashboardPage() {
           />
           <AccuracyCard
             title="Gesture Confidence"
-            value={`${OVERALL_ACCURACY_SUMMARY.gestureConfidence}%`}
+            value={`${evalSummary.gestureConfidence}%`}
             change="AI Confidence"
             color={[6, 182, 212]}
             icon="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
             index={5}
           />
         </div>
+
 
         {/* Main Grid: Left Column & Right Column */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

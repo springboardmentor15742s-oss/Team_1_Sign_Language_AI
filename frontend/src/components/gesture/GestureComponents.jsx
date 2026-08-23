@@ -1,20 +1,99 @@
 import { motion } from 'framer-motion';
+import { useRef, useEffect, useState } from 'react';
+import { recognizeGestureFile } from '../../api/api';
 
 // ─── Camera Card ────────────────────────────────────────────────────────────
-export function CameraCard({ cameraState, onStart, onStop, onCapture, onSwitch }) {
+export function CameraCard({ cameraState, onStart, onStop, onCapture, onSwitch, onRealtimeResult }) {
   const isActive = cameraState === 'active';
   const isLoading = cameraState === 'loading';
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const streamRef = useRef(null);
+  const [cameraError, setCameraError] = useState(null);
+
+  // Manage Live Webcam Stream
+  useEffect(() => {
+    async function startWebcam() {
+      if (isActive) {
+        setCameraError(null);
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
+            audio: false
+          });
+          streamRef.current = stream;
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+            await videoRef.current.play();
+          }
+        } catch (err) {
+          console.warn("Webcam access error:", err);
+          setCameraError("Camera access denied or unavailable. Using live simulation mode.");
+        }
+      } else {
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop());
+          streamRef.current = null;
+        }
+      }
+    }
+    startWebcam();
+
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [isActive]);
+
+  // Continuous Real-Time Recognition Frame Sampler
+  useEffect(() => {
+    let intervalId = null;
+    if (isActive && !cameraError) {
+      intervalId = setInterval(async () => {
+        if (!videoRef.current || !canvasRef.current) return;
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+        if (video.readyState < 2) return;
+
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Convert canvas to blob and send to backend API
+        canvas.toBlob(async (blob) => {
+          if (!blob) return;
+          try {
+            const file = new File([blob], 'frame.jpg', { type: 'image/jpeg' });
+            const result = await recognizeGestureFile(file);
+            if (result && onRealtimeResult) {
+              onRealtimeResult(result);
+            }
+          } catch (e) {
+            // Ignore frame capture errors silently during stream
+          }
+        }, 'image/jpeg', 0.8);
+      }, 800); // 800ms sample interval
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [isActive, cameraError, onRealtimeResult]);
 
   return (
     <div
       className="glass-strong rounded-3xl overflow-hidden flex flex-col"
       style={{ border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}
     >
+      {/* Hidden offscreen canvas for real-time frame capturing */}
+      <canvas ref={canvasRef} className="hidden" />
+
       {/* Camera Viewport */}
-      <div className="relative bg-black" style={{ aspectRatio: '16/9', minHeight: 300 }}>
+      <div className="relative bg-black overflow-hidden flex items-center justify-center" style={{ aspectRatio: '16/9', minHeight: 300 }}>
         {/* Inactive / Idle State */}
         {cameraState === 'idle' && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-5">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 z-10">
             <div className="absolute inset-0 pointer-events-none"
               style={{ background: 'radial-gradient(ellipse at center, rgba(139,92,246,0.08) 0%, transparent 70%)' }}
             />
@@ -30,14 +109,14 @@ export function CameraCard({ cameraState, onStart, onStop, onCapture, onSwitch }
             </motion.div>
             <div className="text-center">
               <p className="text-white/60 text-sm font-medium">Camera is off</p>
-              <p className="text-white/30 text-xs mt-1">Click &quot;Start Camera&quot; to begin gesture recognition</p>
+              <p className="text-white/30 text-xs mt-1">Click &quot;Start Camera&quot; to begin live real-time recognition</p>
             </div>
           </div>
         )}
 
         {/* Loading State */}
         {isLoading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-5">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 z-10 bg-black">
             <div className="absolute inset-0"
               style={{ background: 'radial-gradient(ellipse at center, rgba(59,130,246,0.1) 0%, transparent 70%)' }}
             />
@@ -46,52 +125,59 @@ export function CameraCard({ cameraState, onStart, onStop, onCapture, onSwitch }
               transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
               className="w-14 h-14 rounded-full border-2 border-blue-500/30 border-t-blue-400"
             />
-            <p className="text-blue-300 text-sm font-medium">Initializing camera...</p>
+            <p className="text-blue-300 text-sm font-medium">Connecting to live camera...</p>
           </div>
         )}
 
-        {/* Active State (simulated feed) */}
+        {/* Active State (Real Live HTML5 Video Feed + Overlays) */}
         {isActive && (
-          <div className="absolute inset-0 bg-[#0a0a12] overflow-hidden">
-            {/* Simulated camera noise */}
-            <div className="absolute inset-0 opacity-5 noise-overlay" />
-            {/* Green scanning grid */}
-            <div className="absolute inset-0 opacity-20"
+          <div className="absolute inset-0 bg-black overflow-hidden flex items-center justify-center">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className={`w-full h-full object-cover transform -scale-x-100 ${cameraError ? 'hidden' : 'block'}`}
+            />
+
+            {/* Fallback layout if webcam access is blocked/simulated */}
+            {cameraError && (
+              <div className="absolute inset-0 bg-[#0a0a12] flex flex-col items-center justify-center p-6 text-center">
+                <p className="text-amber-400 text-xs font-semibold mb-2">{cameraError}</p>
+                <div className="text-6xl animate-pulse">🤚</div>
+              </div>
+            )}
+
+            {/* Green scanning grid overlay */}
+            <div className="absolute inset-0 opacity-15 pointer-events-none"
               style={{
                 backgroundImage: 'linear-gradient(rgba(34,197,94,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(34,197,94,0.3) 1px, transparent 1px)',
                 backgroundSize: '40px 40px',
               }}
             />
+
             {/* Scanning beam animation */}
             <motion.div
               animate={{ top: ['5%', '95%', '5%'] }}
               transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-              className="absolute left-0 right-0 h-px opacity-60"
+              className="absolute left-0 right-0 h-px opacity-60 pointer-events-none"
               style={{ background: 'linear-gradient(90deg, transparent, rgba(34,197,94,0.8), transparent)' }}
             />
-            {/* Hand silhouette placeholder */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <motion.div
-                animate={{ scale: [0.97, 1.03, 0.97] }}
-                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-                className="text-[120px] select-none"
-              >
-                🤚
-              </motion.div>
-            </div>
-            {/* Corner brackets (like a real scanner UI) */}
+
+            {/* Corner UI Brackets */}
             {[
               'top-4 left-4 border-t-2 border-l-2',
               'top-4 right-4 border-t-2 border-r-2',
               'bottom-4 left-4 border-b-2 border-l-2',
               'bottom-4 right-4 border-b-2 border-r-2',
             ].map((cls, i) => (
-              <div key={i} className={`absolute w-8 h-8 border-green-400 ${cls}`} />
+              <div key={i} className={`absolute w-8 h-8 border-green-400 pointer-events-none ${cls}`} />
             ))}
-            {/* Live indicator */}
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-sm border border-green-500/30">
+
+            {/* Live indicator badge */}
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-green-500/30 z-20">
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-green-400 text-xs font-bold tracking-widest uppercase">Live</span>
+              <span className="text-green-400 text-xs font-bold tracking-widest uppercase">LIVE REAL-TIME CAMERA</span>
             </div>
           </div>
         )}
@@ -109,6 +195,7 @@ export function CameraCard({ cameraState, onStart, onStop, onCapture, onSwitch }
     </div>
   );
 }
+
 
 // ─── Control Panel ───────────────────────────────────────────────────────────
 export function ControlPanel({ isActive, isLoading, onStart, onStop, onCapture, onSwitch }) {
