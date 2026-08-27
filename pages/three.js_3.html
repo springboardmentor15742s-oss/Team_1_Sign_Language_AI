@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+<!-- STITCH_THREEJS_START:ANIMATION_21 class="fixed inset-0 w-full h-full bg-transparent" -->
+<div class="fixed inset-0 w-full h-full bg-transparent" style="display:block;">
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+<div id="threejs-container-ANIMATION_21" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_21');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  (function() {
+  const container = document.getElementById('threejs-container-ANIMATION_20');
+  
+  const width = container.clientWidth || window.innerWidth;
+  const height = container.clientHeight || window.innerHeight;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+  camera.position.set(0, 0.5, 5);
+
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(window.devicePixelRatio || 1);
+  container.appendChild(renderer.domElement);
+
+  // Studio Lighting
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+  scene.add(ambientLight);
+
+  const keyLight = new THREE.DirectionalLight(0x8b5cf6, 1.5); // Electric Violet
+  keyLight.position.set(5, 5, 5);
+  scene.add(keyLight);
+
+  const fillLight = new THREE.DirectionalLight(0x22d3ee, 1); // Cyan
+  fillLight.position.set(-5, 0, 2);
+  scene.add(fillLight);
+
+  const backLight = new THREE.PointLight(0xffffff, 0.5);
+  backLight.position.set(0, 2, -5);
+  scene.add(backLight);
+
+  // Realistic Hand Model Construction
+  const handGroup = new THREE.Group();
+  scene.add(handGroup);
+
+  const skinMat = new THREE.MeshPhongMaterial({ 
+    color: 0x2a2731, 
+    transparent: true, 
+    opacity: 0.9,
+    shininess: 40,
+    flatShading: false
+  });
+  
+  const jointMat = new THREE.MeshBasicMaterial({ color: 0x22d3ee });
+
+  // Palm - More organic shape
+  const palmBase = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.3, 0.4), skinMat);
+  palmBase.position.y = -0.2;
+  handGroup.add(palmBase);
+
+  // Finger Helper Functions
+  function createFinger(name, x, y, z, lengths, baseRotZ = 0) {
+    const fingerGroup = new THREE.Group();
+    fingerGroup.name = name;
+    fingerGroup.position.set(x, y, z);
+    fingerGroup.rotation.z = baseRotZ;
+
+    const phalanges = [];
+    let currentY = 0;
+
+    lengths.forEach((len, i) => {
+      const segment = new THREE.Group();
+      segment.position.y = i === 0 ? 0 : lengths[i-1];
+      
+      const mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.08 - (i * 0.01), 0.1 - (i * 0.01), len, 12), skinMat);
+      mesh.position.y = len / 2;
+      segment.add(mesh);
+
+      // Landmark dot at joint
+      const joint = new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 8), jointMat);
+      joint.position.y = len;
+      segment.add(joint);
+
+      if (phalanges.length > 0) {
+        phalanges[phalanges.length - 1].add(segment);
+      } else {
+        fingerGroup.add(segment);
+      }
+      phalanges.push(segment);
+    });
+
+    return { group: fingerGroup, phalanges };
+  }
+
+  const fingers = [
+    createFinger('index', -0.4, 0.45, 0, [0.5, 0.4, 0.3]),
+    createFinger('middle', -0.1, 0.55, 0, [0.6, 0.45, 0.35]),
+    createFinger('ring', 0.2, 0.5, 0, [0.55, 0.4, 0.3]),
+    createFinger('pinky', 0.5, 0.35, 0, [0.4, 0.3, 0.25]),
+    createFinger('thumb', 0.65, -0.4, 0.1, [0.45, 0.4], -Math.PI / 3)
+  ];
+
+  fingers.forEach(f => handGroup.add(f.group));
+
+  // Gesture States (Target rotations for joints)
+  const gestures = {
+    'A': {
+      index: [1.5, 1.5, 1.5], middle: [1.5, 1.5, 1.5], ring: [1.5, 1.5, 1.5], pinky: [1.5, 1.5, 1.5], thumb: [0, 0]
+    },
+    'B': {
+      index: [0, 0, 0], middle: [0, 0, 0], ring: [0, 0, 0], pinky: [0, 0, 0], thumb: [0.5, 1.2], thumbRotZ: -0.2
+    },
+    'L': {
+      index: [0, 0, 0], middle: [1.5, 1.5, 1.5], ring: [1.5, 1.5, 1.5], pinky: [1.5, 1.5, 1.5], thumb: [-0.2, 0], thumbRotZ: -Math.PI/2
+    },
+    'V': {
+      index: [0, 0, 0], middle: [0, 0, 0], ring: [1.5, 1.5, 1.5], pinky: [1.5, 1.5, 1.5], thumb: [0.5, 1.2], indexRotZ: 0.2, middleRotZ: -0.2
+    }
+  };
+
+  const gestureKeys = Object.keys(gestures);
+  let currentGestureIdx = 0;
+  let transitionFactor = 0;
+  let time = 0;
+
+  function animate() {
+    requestAnimationFrame(animate);
+    time += 0.01;
+    transitionFactor = (Math.sin(time * 0.5) + 1) / 2;
+    
+    const nextIdx = (currentGestureIdx + 1) % gestureKeys.length;
+    const g1 = gestures[gestureKeys[currentGestureIdx]];
+    const g2 = gestures[gestureKeys[nextIdx]];
+
+    if (transitionFactor > 0.99) {
+       currentGestureIdx = nextIdx;
+    }
+
+    fingers.forEach(f => {
+      const name = f.group.name;
+      const rot1 = g1[name] || [0,0,0];
+      const rot2 = g2[name] || [0,0,0];
+
+      f.phalanges.forEach((p, i) => {
+        const targetRot = rot1[i] + (rot2[i] - rot1[i]) * transitionFactor;
+        p.rotation.x = targetRot;
+      });
+
+      // Special rotation logic for thumb and finger spreads
+      if (name === 'thumb') {
+        const z1 = g1.thumbRotZ !== undefined ? g1.thumbRotZ : -Math.PI/3;
+        const z2 = g2.thumbRotZ !== undefined ? g2.thumbRotZ : -Math.PI/3;
+        f.group.rotation.z = z1 + (z2 - z1) * transitionFactor;
+      }
+      if (name === 'index' || name === 'middle') {
+        const z1 = g1[name + 'RotZ'] || 0;
+        const z2 = g2[name + 'RotZ'] || 0;
+        f.group.rotation.z = z1 + (z2 - z1) * transitionFactor;
+      }
+    });
+
+    handGroup.rotation.y = Math.sin(time) * 0.2;
+    handGroup.position.y = Math.sin(time * 1.5) * 0.1;
+
+    renderer.render(scene, camera);
+  }
+
+  window.addEventListener('resize', () => {
+    const w = container.clientWidth || window.innerWidth;
+    const h = container.clientHeight || window.innerHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  });
+
+  animate();
+})();
+})();
+</script>
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_21 -->
+</body>
+</html>

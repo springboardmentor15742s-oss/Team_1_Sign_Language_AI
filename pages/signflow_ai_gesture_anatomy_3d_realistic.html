@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #15121b;
+      font-family: 'Inter', sans-serif;
+    }
+    .glass-panel {
+      background: rgba(33, 30, 39, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(149, 142, 160, 0.2);
+    }
+</style>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "surface-container-high": "#2c2832",
+                "secondary": "#4cd7f6",
+                "secondary-fixed-dim": "#4cd7f6",
+                "on-primary-container": "#340080",
+                "on-error": "#690005",
+                "surface-container-highest": "#37333d",
+                "surface-container": "#211e27",
+                "primary-container": "#a078ff",
+                "on-secondary-container": "#00424e",
+                "tertiary-fixed-dim": "#ffb869",
+                "primary": "#d0bcff",
+                "on-secondary": "#003640",
+                "surface-dim": "#15121b",
+                "primary-fixed": "#e9ddff",
+                "tertiary-container": "#ca801e",
+                "surface": "#15121b",
+                "on-tertiary": "#482900",
+                "background": "#15121b",
+                "on-background": "#e7e0ed",
+                "inverse-primary": "#6d3bd7",
+                "on-secondary-fixed-variant": "#004e5c",
+                "on-tertiary-container": "#3f2300",
+                "on-primary-fixed": "#23005c",
+                "outline": "#958ea0",
+                "on-primary": "#3c0091",
+                "surface-container-low": "#1d1a23",
+                "error": "#ffb4ab",
+                "on-tertiary-fixed": "#2c1700",
+                "secondary-container": "#03b5d3",
+                "on-surface": "#e7e0ed",
+                "on-tertiary-fixed-variant": "#673d00",
+                "tertiary": "#ffb869",
+                "on-secondary-fixed": "#001f26",
+                "outline-variant": "#494454",
+                "on-primary-fixed-variant": "#5516be",
+                "error-container": "#93000a",
+                "secondary-fixed": "#acedff",
+                "surface-container-lowest": "#0f0d15",
+                "tertiary-fixed": "#ffdcbb",
+                "surface-variant": "#37333d",
+                "surface-tint": "#d0bcff",
+                "inverse-surface": "#e7e0ed",
+                "surface-bright": "#3b3742",
+                "primary-fixed-dim": "#d0bcff",
+                "on-surface-variant": "#cbc3d7",
+                "on-error-container": "#ffdad6",
+                "inverse-on-surface": "#322f39"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        }
+      }
+    }
+  }
+</script>
+</head>
+<body class="bg-background text-on-background">
+<!-- Main Dashboard Wrapper -->
+<div class="relative w-full h-full flex flex-col">
+<!-- Header -->
+<header class="p-md flex items-center justify-between z-10">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">back_hand</span>
+<h1 class="text-label-md uppercase tracking-widest text-on-surface-variant">Gesture Anatomy</h1>
+</div>
+<div class="flex items-center gap-xs">
+<div class="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
+<span class="text-label-sm text-secondary">LIVE TRACKING</span>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 relative">
+<!-- 3D Scene Container -->
+<div class="absolute inset-0 z-0" id="threejs-container-ANIMATION_20"></div>
+<!-- Overlays -->
+<div class="absolute inset-0 pointer-events-none p-md flex flex-col justify-between">
+<!-- Top Panels -->
+<div class="flex justify-between items-start gap-md">
+<div class="glass-panel p-sm rounded-xl flex flex-col gap-xs w-40">
+<span class="text-[10px] text-outline uppercase font-bold">Tracking Status</span>
+<div class="flex items-center justify-between">
+<span class="text-label-md text-on-surface">Neural Engine</span>
+<span class="text-label-sm text-secondary">98%</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[98%]"></div>
+</div>
+</div>
+<div class="glass-panel p-sm rounded-xl flex flex-col gap-xs w-40">
+<span class="text-[10px] text-outline uppercase font-bold">Live Analysis</span>
+<div class="flex items-center justify-between">
+<span class="text-label-md text-on-surface">Confidence</span>
+<span class="text-label-sm text-primary">High</span>
+</div>
+</div>
+</div>
+<!-- Bottom Lesson Info -->
+<div class="space-y-md">
+<div class="glass-panel p-md rounded-xl space-y-sm pointer-events-auto">
+<div class="flex items-center justify-between">
+<h2 class="text-headline-md text-on-surface">Lesson 04: Phalangeal Articulation</h2>
+<span class="text-label-sm text-outline">02:45 / 05:00</span>
+</div>
+<p class="text-body-md text-on-surface-variant">Observe the coordination between the proximal and distal interphalangeal joints during transition.</p>
+<div class="flex gap-sm pt-xs">
+<button class="bg-primary text-on-primary px-md py-sm rounded-full text-label-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+                Resume Lesson
+              </button>
+<button class="bg-surface-container-highest text-on-surface px-md py-sm rounded-full text-label-md">
+                Skip Technique
+              </button>
+</div>
+</div>
+<!-- UI Interaction Hint -->
+<div class="text-center">
+<span class="text-[10px] text-outline uppercase tracking-[0.2em]">Drag to rotate anatomical model</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Navigation -->
+<nav class="h-16 border-t border-outline-variant/30 flex items-center justify-around px-md z-10">
+<button class="text-primary flex flex-col items-center gap-1">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px]">Learn</span>
+</button>
+<button class="text-on-surface-variant flex flex-col items-center gap-1">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px]">Stats</span>
+</button>
+<button class="text-on-surface-variant flex flex-col items-center gap-1">
+<span class="material-symbols-outlined">history</span>
+<span class="text-[10px]">History</span>
+</button>
+<button class="text-on-surface-variant flex flex-col items-center gap-1">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px]">Config</span>
+</button>
+</nav>
+</div>
+<script>
+    <!-- STITCH_THREEJS_START:ANIMATION_21 class="" -->
+<div class="" style="display:block;width:100%;height:100%;min-height:200px;">
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+<div id="threejs-container-ANIMATION_21" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_21');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  (function() {
+  const container = document.getElementById('threejs-container-ANIMATION_20');
+  
+  const width = container.clientWidth || window.innerWidth;
+  const height = container.clientHeight || window.innerHeight;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+  camera.position.set(0, 0.5, 5);
+
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(window.devicePixelRatio || 1);
+  container.appendChild(renderer.domElement);
+
+  // Studio Lighting
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+  scene.add(ambientLight);
+
+  const keyLight = new THREE.DirectionalLight(0x8b5cf6, 1.5); // Electric Violet
+  keyLight.position.set(5, 5, 5);
+  scene.add(keyLight);
+
+  const fillLight = new THREE.DirectionalLight(0x22d3ee, 1); // Cyan
+  fillLight.position.set(-5, 0, 2);
+  scene.add(fillLight);
+
+  const backLight = new THREE.PointLight(0xffffff, 0.5);
+  backLight.position.set(0, 2, -5);
+  scene.add(backLight);
+
+  // Realistic Hand Model Construction
+  const handGroup = new THREE.Group();
+  scene.add(handGroup);
+
+  const skinMat = new THREE.MeshPhongMaterial({ 
+    color: 0x2a2731, 
+    transparent: true, 
+    opacity: 0.9,
+    shininess: 40,
+    flatShading: false
+  });
+  
+  const jointMat = new THREE.MeshBasicMaterial({ color: 0x22d3ee });
+
+  // Palm - More organic shape
+  const palmBase = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.3, 0.4), skinMat);
+  palmBase.position.y = -0.2;
+  handGroup.add(palmBase);
+
+  // Finger Helper Functions
+  function createFinger(name, x, y, z, lengths, baseRotZ = 0) {
+    const fingerGroup = new THREE.Group();
+    fingerGroup.name = name;
+    fingerGroup.position.set(x, y, z);
+    fingerGroup.rotation.z = baseRotZ;
+
+    const phalanges = [];
+    let currentY = 0;
+
+    lengths.forEach((len, i) => {
+      const segment = new THREE.Group();
+      segment.position.y = i === 0 ? 0 : lengths[i-1];
+      
+      const mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.08 - (i * 0.01), 0.1 - (i * 0.01), len, 12), skinMat);
+      mesh.position.y = len / 2;
+      segment.add(mesh);
+
+      // Landmark dot at joint
+      const joint = new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 8), jointMat);
+      joint.position.y = len;
+      segment.add(joint);
+
+      if (phalanges.length > 0) {
+        phalanges[phalanges.length - 1].add(segment);
+      } else {
+        fingerGroup.add(segment);
+      }
+      phalanges.push(segment);
+    });
+
+    return { group: fingerGroup, phalanges };
+  }
+
+  const fingers = [
+    createFinger('index', -0.4, 0.45, 0, [0.5, 0.4, 0.3]),
+    createFinger('middle', -0.1, 0.55, 0, [0.6, 0.45, 0.35]),
+    createFinger('ring', 0.2, 0.5, 0, [0.55, 0.4, 0.3]),
+    createFinger('pinky', 0.5, 0.35, 0, [0.4, 0.3, 0.25]),
+    createFinger('thumb', 0.65, -0.4, 0.1, [0.45, 0.4], -Math.PI / 3)
+  ];
+
+  fingers.forEach(f => handGroup.add(f.group));
+
+  // Gesture States (Target rotations for joints)
+  const gestures = {
+    'A': {
+      index: [1.5, 1.5, 1.5], middle: [1.5, 1.5, 1.5], ring: [1.5, 1.5, 1.5], pinky: [1.5, 1.5, 1.5], thumb: [0, 0]
+    },
+    'B': {
+      index: [0, 0, 0], middle: [0, 0, 0], ring: [0, 0, 0], pinky: [0, 0, 0], thumb: [0.5, 1.2], thumbRotZ: -0.2
+    },
+    'L': {
+      index: [0, 0, 0], middle: [1.5, 1.5, 1.5], ring: [1.5, 1.5, 1.5], pinky: [1.5, 1.5, 1.5], thumb: [-0.2, 0], thumbRotZ: -Math.PI/2
+    },
+    'V': {
+      index: [0, 0, 0], middle: [0, 0, 0], ring: [1.5, 1.5, 1.5], pinky: [1.5, 1.5, 1.5], thumb: [0.5, 1.2], indexRotZ: 0.2, middleRotZ: -0.2
+    }
+  };
+
+  const gestureKeys = Object.keys(gestures);
+  let currentGestureIdx = 0;
+  let transitionFactor = 0;
+  let time = 0;
+
+  function animate() {
+    requestAnimationFrame(animate);
+    time += 0.01;
+    transitionFactor = (Math.sin(time * 0.5) + 1) / 2;
+    
+    const nextIdx = (currentGestureIdx + 1) % gestureKeys.length;
+    const g1 = gestures[gestureKeys[currentGestureIdx]];
+    const g2 = gestures[gestureKeys[nextIdx]];
+
+    if (transitionFactor > 0.99) {
+       currentGestureIdx = nextIdx;
+    }
+
+    fingers.forEach(f => {
+      const name = f.group.name;
+      const rot1 = g1[name] || [0,0,0];
+      const rot2 = g2[name] || [0,0,0];
+
+      f.phalanges.forEach((p, i) => {
+        const targetRot = rot1[i] + (rot2[i] - rot1[i]) * transitionFactor;
+        p.rotation.x = targetRot;
+      });
+
+      // Special rotation logic for thumb and finger spreads
+      if (name === 'thumb') {
+        const z1 = g1.thumbRotZ !== undefined ? g1.thumbRotZ : -Math.PI/3;
+        const z2 = g2.thumbRotZ !== undefined ? g2.thumbRotZ : -Math.PI/3;
+        f.group.rotation.z = z1 + (z2 - z1) * transitionFactor;
+      }
+      if (name === 'index' || name === 'middle') {
+        const z1 = g1[name + 'RotZ'] || 0;
+        const z2 = g2[name + 'RotZ'] || 0;
+        f.group.rotation.z = z1 + (z2 - z1) * transitionFactor;
+      }
+    });
+
+    handGroup.rotation.y = Math.sin(time) * 0.2;
+    handGroup.position.y = Math.sin(time * 1.5) * 0.1;
+
+    renderer.render(scene, camera);
+  }
+
+  window.addEventListener('resize', () => {
+    const w = container.clientWidth || window.innerWidth;
+    const h = container.clientHeight || window.innerHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  });
+
+  animate();
+})();
+})();
+</script>
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_21 -->
+  </script>
+</body></html>
