@@ -121,32 +121,82 @@ export const assessmentHistory = [
   }
 ];
 
-export const certificatesList = [
+export const initialCertificatesList = [
   {
     id: 'C001',
-    courseName: 'ASL Alphabet Mastery',
+    courseId: 'asl-fundamentals-101',
+    courseName: 'Foundations of American Sign Language (ASL)',
     learnerName: 'Alex Morgan',
     issueDate: '2026-06-15',
     status: 'Unlocked',
     level: 'Beginner',
-    verificationId: 'CERT-8472-9102'
+    score: 96,
+    verificationId: 'CERT-SLAI-84729102'
   },
   {
     id: 'C002',
-    courseName: 'Conversational ASL I',
+    courseId: 'everyday-comm-201',
+    courseName: 'Everyday Signs for Daily Conversations',
     learnerName: 'Alex Morgan',
     issueDate: 'N/A',
     status: 'Locked',
     level: 'Intermediate',
+    score: 88,
     progress: 80
   },
   {
     id: 'C003',
-    courseName: 'Professional Interpreter (Medical)',
+    courseId: 'professional-sign-301',
+    courseName: 'Professional & Workplace Sign Communication',
     learnerName: 'Alex Morgan',
     issueDate: 'N/A',
     status: 'Locked',
     level: 'Professional',
+    score: 92,
     progress: 15
   }
 ];
+
+export const certificatesList = initialCertificatesList;
+
+export function getUserCertificates(userEmail = 'default') {
+  try {
+    const key = `mira_user_certificates_${userEmail}`;
+    const stored = localStorage.getItem(key);
+    if (stored) {
+      const customCerts = JSON.parse(stored);
+      // Merge with initial, replacing matching IDs
+      const merged = [...customCerts];
+      initialCertificatesList.forEach(ic => {
+        if (!merged.some(m => m.id === ic.id || m.courseId === ic.courseId)) {
+          merged.push(ic);
+        }
+      });
+      return merged;
+    }
+  } catch (e) {
+    console.error('Error loading user certificates', e);
+  }
+  return initialCertificatesList;
+}
+
+export function saveUserCertificate(cert, userEmail = 'default') {
+  try {
+    const key = `mira_user_certificates_${userEmail}`;
+    const current = getUserCertificates(userEmail);
+    const existingIdx = current.findIndex(c => c.id === cert.id || (c.courseId && c.courseId === cert.courseId));
+    let updated;
+    if (existingIdx >= 0) {
+      updated = [...current];
+      updated[existingIdx] = { ...updated[existingIdx], ...cert, status: 'Unlocked' };
+    } else {
+      updated = [cert, ...current];
+    }
+    localStorage.setItem(key, JSON.stringify(updated));
+    return updated;
+  } catch (e) {
+    console.error('Error saving user certificate', e);
+    return [cert];
+  }
+}
+

@@ -3,19 +3,25 @@ import { motion } from 'framer-motion';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import CertificateCard from '../../components/certification/CertificateCard';
 import LoadingSkeleton from '../../components/certification/LoadingSkeleton';
-import { certificatesList } from '../../data/assessmentModuleData';
+import { certificatesList, getUserCertificates } from '../../data/assessmentModuleData';
+import { useAuth } from '../../context/AuthContext';
 
 export default function CertificationDashboardPage() {
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const userEmail = user?.email || 'default';
+  const [allCertificates, setAllCertificates] = useState([]);
 
   useEffect(() => {
-    // Simulate loading delay
-    const timer = setTimeout(() => setLoading(false), 600);
+    // Load certificates for current user
+    const certs = getUserCertificates(userEmail);
+    setAllCertificates(certs);
+    const timer = setTimeout(() => setLoading(false), 300);
     return () => clearTimeout(timer);
-  }, []);
+  }, [userEmail]);
 
-  const unlocked = certificatesList.filter(c => c.status === 'Unlocked');
-  const locked = certificatesList.filter(c => c.status === 'Locked');
+  const unlocked = allCertificates.filter(c => c.status === 'Unlocked');
+  const locked = allCertificates.filter(c => c.status === 'Locked');
 
   return (
     <DashboardLayout>

@@ -90,3 +90,26 @@ export async function calculatePerformanceScore(scoreData) {
 export async function getModelsStatus() {
     return apiRequest("/prediction/models", "GET");
 }
+
+// ─── Video Management Service APIs ───────────────────────────────────────────
+export async function getVideoCatalog(category = null) {
+    const query = category ? `?category=${encodeURIComponent(category)}` : '';
+    return apiRequest(`/video/catalog${query}`, "GET");
+}
+
+export async function getVideoStreamInfo(videoId) {
+    return apiRequest(`/video/stream/${videoId}`, "GET");
+}
+
+// ─── Dataset Catalog APIs ────────────────────────────────────────────────────
+export async function getDatasetsList() {
+    return apiRequest("/datasets/", "GET");
+}
+
+export async function getDatasetDetails(datasetId) {
+    return apiRequest(`/datasets/${datasetId}`, "GET");
+}
+
+export async function getDatasetSamples(datasetId) {
+    return apiRequest(`/datasets/${datasetId}/samples`, "GET");
+}

@@ -490,30 +490,134 @@ export const MOCK_COURSES = [
   }
 ];
 
+/* ─── PROGRESS PERSISTENCE & EVENT DISPATCHER ────────────────────── */
+
+export function getActiveUserEmail(explicitEmail) {
+  if (explicitEmail && explicitEmail !== 'default' && explicitEmail !== '') {
+    return explicitEmail.toLowerCase().trim();
+  }
+  try {
+    const storedUser = localStorage.getItem('mira_user');
+    if (storedUser) {
+      const parsed = JSON.parse(storedUser);
+      if (parsed?.email) return parsed.email.toLowerCase().trim();
+    }
+    const storedEmail = localStorage.getItem('mira_user_email');
+    if (storedEmail) return storedEmail.toLowerCase().trim();
+  } catch (e) {
+    console.warn('Could not read user email from storage', e);
+  }
+  return 'alex.morgan@email.com';
+}
+
+export function getCompletedLessonIds(courseId, userEmail) {
+  try {
+    const email = getActiveUserEmail(userEmail);
+    const key = `mira_completed_lessons_${courseId}_${email}`;
+    const stored = localStorage.getItem(key);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('Error reading completed lessons from storage', e);
+  }
+  return [];
+}
+
+export function saveCompletedLesson(courseId, lessonId, isCompleted, userEmail) {
+  try {
+    const email = getActiveUserEmail(userEmail);
+    const key = `mira_completed_lessons_${courseId}_${email}`;
+    let current = getCompletedLessonIds(courseId, email);
+    if (isCompleted) {
+      if (!current.includes(lessonId)) {
+        current.push(lessonId);
+      }
+    } else {
+      current = current.filter(id => id !== lessonId);
+    }
+    localStorage.setItem(key, JSON.stringify(current));
+
+    // Dispatch global real-time synchronization event
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('mira_course_progress_updated', {
+          detail: { courseId, lessonId, isCompleted, userEmail: email }
+        })
+      );
+    }
+
+    return current;
+  } catch (e) {
+    console.error('Error saving completed lesson to storage', e);
+    return [];
+  }
+}
+
+export function getCourseWithUserProgress(courseId, userEmail) {
+  const email = getActiveUserEmail(userEmail);
+  const base = MOCK_COURSES.find(c => c.id === courseId) || MOCK_COURSES[0];
+  const completedIds = getCompletedLessonIds(base.id, email);
+
+  let totalLessons = 0;
+  let completedCount = 0;
+
+  const modules = base.modules.map(mod => {
+    const lessons = mod.lessons.map(les => {
+      totalLessons += 1;
+      const isDone = completedIds.includes(les.id);
+      if (isDone) completedCount += 1;
+      return {
+        ...les,
+        completed: isDone
+      };
+    });
+    return {
+      ...mod,
+      lessons
+    };
+  });
+
+  const progress = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+  const isCompleted = progress === 100;
+
+  return {
+    ...base,
+    modules,
+    progress,
+    totalLessons,
+    completedLessonsCount: completedCount,
+    isCompleted
+  };
+}
+
 /* Helper queries */
-export function getCourses() {
-  return MOCK_COURSES;
+export function getCourses(userEmail) {
+  const email = getActiveUserEmail(userEmail);
+  return MOCK_COURSES.map(c => getCourseWithUserProgress(c.id, email));
 }
 
-export function getCourseById(id) {
-  return MOCK_COURSES.find(c => c.id === id) || MOCK_COURSES[0];
+export function getCourseById(id, userEmail) {
+  const email = getActiveUserEmail(userEmail);
+  return getCourseWithUserProgress(id, email);
 }
 
-export function getLessonById(lessonId) {
+export function getLessonById(lessonId, userEmail) {
+  const email = getActiveUserEmail(userEmail);
   for (const course of MOCK_COURSES) {
-    for (const mod of course.modules) {
+    const hydratedCourse = getCourseWithUserProgress(course.id, email);
+    for (const mod of hydratedCourse.modules) {
       const found = mod.lessons.find(l => l.id === lessonId);
       if (found) {
         return {
           lesson: found,
           module: mod,
-          course: course
+          course: hydratedCourse
         };
       }
     }
   }
-  // Fallback to first lesson
-  const firstCourse = MOCK_COURSES[0];
+  const firstCourse = getCourseWithUserProgress(MOCK_COURSES[0].id, email);
   const firstModule = firstCourse.modules[0];
   const firstLesson = firstModule.lessons[0];
   return {
@@ -523,18 +627,18 @@ export function getLessonById(lessonId) {
   };
 }
 
-export function getContinueLearningCourses() {
-  return MOCK_COURSES.filter(c => c.progress > 0 && c.progress < 100);
+export function getContinueLearningCourses(userEmail) {
+  return getCourses(userEmail).filter(c => c.progress > 0 && c.progress < 100);
 }
 
-export function getRecommendedCourses() {
-  return MOCK_COURSES.filter(c => c.isRecommended);
+export function getRecommendedCourses(userEmail) {
+  return getCourses(userEmail).filter(c => c.isRecommended);
 }
 
-export function getPopularCourses() {
-  return MOCK_COURSES.filter(c => c.isPopular);
+export function getPopularCourses(userEmail) {
+  return getCourses(userEmail).filter(c => c.isPopular);
 }
 
-export function getRecentlyViewedCourses() {
-  return MOCK_COURSES.filter(c => c.isRecentlyViewed);
+export function getRecentlyViewedCourses(userEmail) {
+  return getCourses(userEmail).filter(c => c.isRecentlyViewed);
 }

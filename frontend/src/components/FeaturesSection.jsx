@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const features = [
   {
@@ -80,6 +81,7 @@ const features = [
 function FeatureCard({ feature, index }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
+  const navigate = useNavigate();
 
   return (
     <motion.div
@@ -87,7 +89,8 @@ function FeatureCard({ feature, index }) {
       initial={{ opacity: 0, y: 50 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.8, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
-      className="group relative gradient-border p-6 flex flex-col gap-5 overflow-hidden cursor-default"
+      onClick={() => navigate('/courses')}
+      className="group relative gradient-border p-6 flex flex-col gap-5 overflow-hidden cursor-pointer"
       style={{
         background: 'rgba(10, 8, 20, 0.7)',
         borderRadius: '20px',

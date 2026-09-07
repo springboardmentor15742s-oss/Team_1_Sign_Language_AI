@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import HandVisual from './HandVisual';
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 40 },
+  hidden: { opacity: 0, y: 30 },
   visible: (i = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.8, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] },
   }),
 };
 
@@ -14,7 +15,7 @@ export default function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center pt-28 pb-20 px-4 overflow-hidden">
       {/* Top accent line */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-40"
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-40 pointer-events-none"
         style={{ background: 'linear-gradient(180deg, transparent, rgba(139,92,246,0.5), transparent)' }}
       />
 
@@ -84,34 +85,42 @@ export default function HeroSection() {
               initial="hidden"
               animate="visible"
               custom={3}
-              className="flex flex-wrap gap-4 items-center"
+              className="flex flex-wrap gap-4 items-center relative z-30"
             >
-              <motion.button
-                className="btn-primary text-base flex items-center gap-2"
-                style={{ padding: '14px 32px' }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.97 }}
+              <Link
+                to="/free-trial"
+                className="btn-primary text-base inline-flex items-center gap-2 cursor-pointer relative z-30"
+                style={{ padding: '14px 28px' }}
               >
-                <span className="relative z-10">Get Started</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-1" />
+                <span className="relative z-10">Start Single Free Trial</span>
                 <svg className="relative z-10 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
-              </motion.button>
+              </Link>
 
-              <motion.button
-                className="btn-secondary text-base flex items-center gap-2"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.97 }}
+              <Link
+                to="/register"
+                className="btn-secondary text-base inline-flex items-center gap-2 cursor-pointer relative z-30"
+                style={{ padding: '14px 28px' }}
               >
-                <div className="w-8 h-8 rounded-full flex items-center justify-center"
+                Register
+              </Link>
+
+              <Link
+                to="/gesture-recognition"
+                className="btn-secondary text-base inline-flex items-center gap-2 cursor-pointer relative z-30"
+                style={{ padding: '14px 28px' }}
+              >
+                <div className="w-6 h-6 rounded-full flex items-center justify-center"
                   style={{ background: 'rgba(139,92,246,0.2)', border: '1px solid rgba(139,92,246,0.3)' }}
                 >
-                  <svg className="w-3.5 h-3.5 text-purple-400 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 text-purple-400 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
                 </div>
                 Watch Demo
-              </motion.button>
+              </Link>
             </motion.div>
 
             {/* Stats */}
