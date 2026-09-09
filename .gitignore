@@ -18,6 +18,9 @@ cd backend
 # 2. Start Frontend React Server (in a VSCode(windows) new terminal tab)
 cd frontend
 
+# 3. Run Backend Test Suite
+cd backend
+pytest tests/ -v
 
 backend: uvicorn app.main:app --reload
 
