@@ -29,6 +29,8 @@ frontend: npm run dev
 
 http://127.0.0.1:8000/ -> backend webpage
 
-http://localhost:8000/docs -> saved documents
+http://localhost:8000/docs -> Swagger UI (interactive API testing) ==> saved documents
+
+http://127.0.0.1:8000/redoc -> API documentation view
 
 http://localhost:5173/ -> frontend webpage
