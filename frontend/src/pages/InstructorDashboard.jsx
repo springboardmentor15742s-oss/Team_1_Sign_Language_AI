@@ -3,9 +3,12 @@ import { useAuth } from '../context/AuthContext';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { DashboardHeader, StatCard, ChartCard, ActivityCard, RecentTable } from '../components/dashboard/DashboardComponents';
 import { instructorData } from '../data/dashboardData';
+import { getInstructorDashboard } from '../api/api';
 
 export default function InstructorDashboard() {
   const [userName, setUserName] = useState('Instructor');
+  const [stats, setStats] = useState(instructorData.stats);
+  const [backendSynced, setBackendSynced] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -15,6 +18,22 @@ export default function InstructorDashboard() {
       const storedName = localStorage.getItem('mira_user_name');
       if (storedName) setUserName(storedName);
     }
+
+    getInstructorDashboard()
+      .then(data => {
+        if (data && typeof data.total_students === 'number') {
+          setStats(prev => prev.map(s => {
+            if (s.label.toLowerCase().includes('student')) {
+              return { ...s, value: `${data.total_students}` };
+            }
+            return s;
+          }));
+          setBackendSynced(true);
+        }
+      })
+      .catch(err => {
+        console.warn('[InstructorDashboard] fetch error, using local data:', err);
+      });
   }, [user]);
 
   const studentColumns = [
@@ -33,8 +52,9 @@ export default function InstructorDashboard() {
   ];
 
   const headerBadges = [
-    { label: 'Instructor Portal', className: 'text-purple-300 bg-purple-500/10 border border-purple-500/30' }
-  ];
+    { label: 'Instructor Portal', className: 'text-purple-300 bg-purple-500/10 border border-purple-500/30' },
+    backendSynced ? { label: '● PostgreSQL Synced', className: 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/30' } : null
+  ].filter(Boolean);
 
   return (
     <DashboardLayout>
@@ -50,7 +70,7 @@ export default function InstructorDashboard() {
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {instructorData.stats.map((stat, i) => (
+        {stats.map((stat, i) => (
           <StatCard key={stat.label} stat={stat} index={i} />
         ))}
       </div>

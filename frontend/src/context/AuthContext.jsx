@@ -1,8 +1,41 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { apiRequest } from '../api/api';
 
 /* ─── Known Accounts & Role Access Configurations ────────────────── */
 export const KNOWN_ACCOUNTS = {
   learner: {
+    email: 'learner@mira.ai',
+    password: 'Password123!',
+    name: 'Sarah Miller',
+    role: 'Learner',
+    allowedRoles: ['Learner'],
+    badge: 'Standard Learner',
+  },
+  instructor: {
+    email: 'instructor@mira.ai',
+    password: 'Password123!',
+    name: 'Prof. David Clark',
+    role: 'Instructor',
+    allowedRoles: ['Instructor'],
+    badge: 'Certified Instructor',
+  },
+  trainer: {
+    email: 'trainer@mira.ai',
+    password: 'Password123!',
+    name: 'Elena Rostova',
+    role: 'Accessibility Trainer',
+    allowedRoles: ['Accessibility Trainer'],
+    badge: 'Accessibility Specialist',
+  },
+  admin: {
+    email: 'admin@mira.ai',
+    password: 'Password123!',
+    name: 'System Admin',
+    role: 'Administrator',
+    allowedRoles: ['Administrator', 'Instructor', 'Accessibility Trainer', 'Learner'],
+    badge: 'Platform Administrator',
+  },
+  legacyLearner: {
     email: 'learner@signai.com',
     password: 'learner123',
     name: 'Alex Morgan',
@@ -10,36 +43,12 @@ export const KNOWN_ACCOUNTS = {
     allowedRoles: ['Learner'],
     badge: 'Standard Learner',
   },
-  instructor: {
-    email: 'instructor@signai.com',
-    password: 'instructor123',
-    name: 'Prof. Sarah Jenkins',
-    role: 'Instructor',
-    allowedRoles: ['Instructor'],
-    badge: 'Certified Instructor',
-  },
-  trainer: {
-    email: 'trainer@signai.com',
-    password: 'trainer123',
-    name: 'Marcus Vance',
-    role: 'Accessibility Trainer',
-    allowedRoles: ['Accessibility Trainer'],
-    badge: 'Accessibility Specialist',
-  },
-  admin: {
-    email: 'admin@signai.com',
-    password: 'admin123',
-    name: 'Elena Rostova',
-    role: 'Administrator',
-    allowedRoles: ['Administrator', 'Instructor', 'Accessibility Trainer', 'Learner'],
-    badge: 'Platform Administrator',
-  },
 };
 
 /* ─── Default User State Fallback ────────────────────────────────── */
 const DEFAULT_USER = {
-  name: 'Alex Morgan',
-  email: 'learner@signai.com',
+  name: 'Sarah Miller',
+  email: 'learner@mira.ai',
   role: 'Learner',
   accountType: 'learner',
   allowedRoles: ['Learner'],
@@ -58,11 +67,11 @@ const AuthContext = createContext(null);
 
 /* ─── AuthProvider Component ─────────────────────────────────────── */
 export function AuthProvider({ children }) {
-  // Initialize authentication state from localStorage
+  // Initialize authentication state from localStorage (only valid tokens)
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     const authFlag = localStorage.getItem('mira_authenticated');
     const token = localStorage.getItem('token');
-    return authFlag === 'true' || Boolean(token);
+    return authFlag === 'true' && Boolean(token && !token.startsWith('jwt_session_'));
   });
 
   const [role, setRole] = useState(() => {
@@ -125,75 +134,88 @@ export function AuthProvider({ children }) {
     return allowed.includes(targetRoleTitle);
   };
 
-  // Login handler
-  const login = (userData = {}) => {
-    const emailLower = (userData.email || '').toLowerCase().trim();
-    
-    // Check known accounts
+  // Real backend login handler
+  const login = async (credentials = {}) => {
+    const emailLower = (credentials.email || '').toLowerCase().trim();
+    const password = credentials.password;
+
+    if (!emailLower || !password) {
+      throw new Error('Email and password are required.');
+    }
+
+    // Call real FastAPI backend: POST /auth/login
+    const result = await apiRequest('/auth/login', 'POST', {
+      email: emailLower,
+      password: password,
+    });
+
+    const token = result.access_token;
+    const backendRole = result.role || 'learner';
+
+    // Normalize role for UI
+    let normalizedRole = 'Learner';
+    const roleLower = backendRole.toLowerCase();
+    if (roleLower === 'instructor') normalizedRole = 'Instructor';
+    else if (roleLower === 'accessibility trainer' || roleLower === 'trainer') normalizedRole = 'Accessibility Trainer';
+    else if (roleLower === 'administrator' || roleLower === 'admin') normalizedRole = 'Administrator';
+    else normalizedRole = 'Learner';
+
+    // Match known accounts metadata if available
     let matchedAccount = Object.values(KNOWN_ACCOUNTS).find(
       acc => acc.email.toLowerCase() === emailLower
     );
 
-    let assignedRole = userData.role || (matchedAccount ? matchedAccount.role : 'Learner');
-    let allowedRoles = matchedAccount ? matchedAccount.allowedRoles : ['Learner'];
-    let assignedName = userData.name || (matchedAccount ? matchedAccount.name : (emailLower.split('@')[0] || 'User'));
-
-    const token = userData.token || localStorage.getItem('token') || `jwt_session_${Date.now()}`;
+    let assignedName = credentials.name || (matchedAccount ? matchedAccount.name : (emailLower.split('@')[0] || 'User'));
+    let allowedRoles = matchedAccount ? matchedAccount.allowedRoles : [normalizedRole];
+    if (normalizedRole === 'Administrator' && !allowedRoles.includes('Administrator')) {
+      allowedRoles = ['Administrator', 'Instructor', 'Accessibility Trainer', 'Learner'];
+    }
 
     const updatedUser = {
       ...DEFAULT_USER,
       ...user,
-      ...userData,
-      email: emailLower || 'learner@signai.com',
+      email: emailLower,
       name: assignedName,
-      role: assignedRole,
+      role: normalizedRole,
       allowedRoles: allowedRoles,
-      accountType: matchedAccount ? matchedAccount.role.toLowerCase() : 'learner'
+      accountType: normalizedRole.toLowerCase(),
     };
 
     setUser(updatedUser);
-    setRole(assignedRole);
+    setRole(normalizedRole);
     setIsAuthenticated(true);
 
-    // Synchronize to localStorage immediately
+    // Synchronize to localStorage
     localStorage.setItem('token', token);
-    localStorage.setItem('role', assignedRole);
-    localStorage.setItem('mira_user_role', assignedRole);
+    localStorage.setItem('role', normalizedRole);
+    localStorage.setItem('mira_user_role', normalizedRole);
     localStorage.setItem('mira_authenticated', 'true');
     localStorage.setItem('mira_user', JSON.stringify(updatedUser));
     localStorage.setItem('mira_user_name', assignedName);
 
-    return updatedUser;
+    return { user: updatedUser, token, role: normalizedRole };
   };
 
-  // Register handler - new registered users default to Learner role
-  const register = (userData = {}) => {
+  // Real backend register handler
+  const register = async (userData = {}) => {
     const emailLower = (userData.email || '').toLowerCase().trim();
-    const token = `jwt_session_${Date.now()}`;
-    const assignedName = userData.name || emailLower.split('@')[0] || 'New Learner';
+    const fullName = userData.full_name || userData.name || emailLower.split('@')[0];
+    const password = userData.password;
+    const role = (userData.role || 'learner').toLowerCase();
 
-    const newUser = {
-      ...DEFAULT_USER,
-      ...userData,
+    if (!emailLower || !password || !fullName) {
+      throw new Error('Full name, email, and password are required.');
+    }
+
+    // Call real FastAPI backend: POST /auth/register
+    const result = await apiRequest('/auth/register', 'POST', {
+      full_name: fullName,
       email: emailLower,
-      name: assignedName,
-      role: 'Learner',
-      allowedRoles: ['Learner'],
-      accountType: 'learner',
-    };
+      password: password,
+      role: role,
+    });
 
-    setUser(newUser);
-    setRole('Learner');
-    setIsAuthenticated(true);
-
-    localStorage.setItem('token', token);
-    localStorage.setItem('role', 'Learner');
-    localStorage.setItem('mira_user_role', 'Learner');
-    localStorage.setItem('mira_authenticated', 'true');
-    localStorage.setItem('mira_user', JSON.stringify(newUser));
-    localStorage.setItem('mira_user_name', assignedName);
-
-    return newUser;
+    return result;
   };
 
   // Logout handler
@@ -229,11 +251,11 @@ export function AuthProvider({ children }) {
 
   // Select Role handler
   const selectRole = (newRole) => {
-    const token = localStorage.getItem('token') || `jwt_session_${Date.now()}`;
+    const token = localStorage.getItem('token');
     
     // Update local state
     setRole(newRole);
-    setIsAuthenticated(true);
+    setIsAuthenticated(Boolean(token));
 
     // Update user object with selected role
     setUser(prev => {
@@ -243,10 +265,10 @@ export function AuthProvider({ children }) {
     });
 
     // Synchronize to localStorage
-    localStorage.setItem('token', token);
+    if (token) localStorage.setItem('token', token);
     localStorage.setItem('role', newRole);
     localStorage.setItem('mira_user_role', newRole);
-    localStorage.setItem('mira_authenticated', 'true');
+    if (token) localStorage.setItem('mira_authenticated', 'true');
   };
 
   // Single Free Trial controls

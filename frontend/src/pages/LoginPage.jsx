@@ -187,6 +187,7 @@ export default function LoginPage() {
   const [showPw, setShowPw]     = useState(false);
   const [remember, setRemember] = useState(false);
   const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
   const [success, setSuccess]   = useState(false);
   const [oauthModal, setOauthModal] = useState(null); // 'Google' | 'Microsoft' | 'Apple'
   const [accountEmail, setAccountEmail] = useState('user@gmail.com');
@@ -201,15 +202,22 @@ export default function LoginPage() {
     return () => clearTimeout(timer);
   }, [success, navigate]);
 
-  const handleSubmit = e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password) return;
+    if (!email || !password) {
+      setError('Please enter both email and password.');
+      return;
+    }
+    setError('');
     setLoading(true);
-    setTimeout(() => {
-      login({ email, name: email.split('@')[0] });
-      setLoading(false);
+    try {
+      await login({ email, password });
       setSuccess(true);
-    }, 2000);
+    } catch (err) {
+      setError(err.message || 'Invalid credentials. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleOAuthAuthorize = () => {
@@ -247,6 +255,18 @@ export default function LoginPage() {
             onSubmit={handleSubmit}
             className="flex flex-col gap-5"
           >
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-3 rounded-xl flex items-center gap-2.5 text-xs text-rose-300 bg-rose-500/10 border border-rose-500/25"
+              >
+                <svg className="w-4 h-4 flex-shrink-0 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{error}</span>
+              </motion.div>
+            )}
             {/* Email */}
             <AuthInput
               id="email" label="Email Address" type="email"

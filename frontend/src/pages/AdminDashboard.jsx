@@ -3,9 +3,12 @@ import { useAuth } from '../context/AuthContext';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { DashboardHeader, StatCard, ChartCard, ActivityCard, RecentTable } from '../components/dashboard/DashboardComponents';
 import { adminData } from '../data/dashboardData';
+import { getAdminDashboard } from '../api/api';
 
 export default function AdminDashboard() {
   const [userName, setUserName] = useState('Admin');
+  const [stats, setStats] = useState(adminData.stats);
+  const [backendSynced, setBackendSynced] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -15,6 +18,22 @@ export default function AdminDashboard() {
       const storedName = localStorage.getItem('mira_user_name');
       if (storedName) setUserName(storedName);
     }
+
+    getAdminDashboard()
+      .then(data => {
+        if (data && typeof data.platform_users === 'number') {
+          setStats(prev => prev.map(s => {
+            if (s.label.toLowerCase().includes('user') || s.label.toLowerCase().includes('total')) {
+              return { ...s, value: `${data.platform_users}` };
+            }
+            return s;
+          }));
+          setBackendSynced(true);
+        }
+      })
+      .catch(err => {
+        console.warn('[AdminDashboard] fetch error:', err);
+      });
   }, [user]);
 
   const userColumns = [
@@ -41,8 +60,9 @@ export default function AdminDashboard() {
   ];
 
   const headerBadges = [
-    { label: 'System Administrator', className: 'text-amber-400 bg-amber-500/10 border border-amber-500/30' }
-  ];
+    { label: 'System Administrator', className: 'text-amber-400 bg-amber-500/10 border border-amber-500/30' },
+    backendSynced ? { label: '● PostgreSQL Synced', className: 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/30' } : null
+  ].filter(Boolean);
 
   return (
     <DashboardLayout>
@@ -63,7 +83,7 @@ export default function AdminDashboard() {
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {adminData.stats.map((stat, i) => (
+        {stats.map((stat, i) => (
           <StatCard key={stat.label} stat={stat} index={i} />
         ))}
       </div>

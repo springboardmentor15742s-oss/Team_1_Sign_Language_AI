@@ -3,9 +3,12 @@ import { useAuth } from '../context/AuthContext';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { DashboardHeader, StatCard, ChartCard, ActivityCard, RecentTable } from '../components/dashboard/DashboardComponents';
 import { trainerData } from '../data/dashboardData';
+import { getTrainerDashboard } from '../api/api';
 
 export default function TrainerDashboard() {
   const [userName, setUserName] = useState('Trainer');
+  const [stats, setStats] = useState(trainerData.stats);
+  const [backendSynced, setBackendSynced] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -15,6 +18,22 @@ export default function TrainerDashboard() {
       const storedName = localStorage.getItem('mira_user_name');
       if (storedName) setUserName(storedName);
     }
+
+    getTrainerDashboard()
+      .then(data => {
+        if (data && typeof data.learner_engagement === 'number') {
+          setStats(prev => prev.map(s => {
+            if (s.label.toLowerCase().includes('engagement') || s.label.toLowerCase().includes('active')) {
+              return { ...s, value: `${data.learner_engagement}` };
+            }
+            return s;
+          }));
+          setBackendSynced(true);
+        }
+      })
+      .catch(err => {
+        console.warn('[TrainerDashboard] fetch error:', err);
+      });
   }, [user]);
 
   const learnerColumns = [
@@ -44,8 +63,9 @@ export default function TrainerDashboard() {
   ];
 
   const headerBadges = [
-    { label: 'Accessibility Trainer Portal', className: 'text-blue-300 bg-blue-500/10 border border-blue-500/30' }
-  ];
+    { label: 'Accessibility Trainer Portal', className: 'text-blue-300 bg-blue-500/10 border border-blue-500/30' },
+    backendSynced ? { label: '● PostgreSQL Synced', className: 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/30' } : null
+  ].filter(Boolean);
 
   return (
     <DashboardLayout>
@@ -61,7 +81,7 @@ export default function TrainerDashboard() {
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {trainerData.stats.map((stat, i) => (
+        {stats.map((stat, i) => (
           <StatCard key={stat.label} stat={stat} index={i} />
         ))}
       </div>

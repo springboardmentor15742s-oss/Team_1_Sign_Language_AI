@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams, useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play,
@@ -17,15 +17,20 @@ import {
   Sparkles,
   Layers,
   ArrowLeft,
-  RefreshCw
+  RefreshCw,
+  ExternalLink,
+  Cpu
 } from 'lucide-react';
 
 import { getLessonById, MOCK_COURSES } from '../data/courses';
+import { getCourses, getCourseLessons } from '../api/api';
 import CourseSidebar from '../components/course/CourseSidebar';
 
 export default function LessonPlayerPage() {
   const { lessonId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
 
   const [lessonData, setLessonData] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -33,15 +38,121 @@ export default function LessonPlayerPage() {
   const [isCompleted, setIsCompleted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showPracticeModal, setShowPracticeModal] = useState(false);
-  const [practiceStatus, setPracticeStatus] = useState('idle'); // 'idle' | 'detecting' | 'success'
 
   useEffect(() => {
-    const data = getLessonById(lessonId);
-    if (data) {
-      setLessonData(data);
-      setIsCompleted(!!data.lesson.completed);
+    let isMounted = true;
+
+    async function fetchBackendLesson() {
+      try {
+        const backendCourses = await getCourses();
+        if (!isMounted) return;
+
+        // Determine courseId from params or state or estimate from lessonId
+        let paramCourseId = searchParams.get('courseId') || location.state?.courseId;
+        let courseIdNum = paramCourseId ? Number(paramCourseId) : null;
+
+        const numLessonId = Number(lessonId);
+        if (!courseIdNum && !isNaN(numLessonId)) {
+          // Lessons in DB: 1-3 -> Course 1, 4-6 -> Course 2, 7-9 -> Course 3, etc.
+          courseIdNum = Math.ceil(numLessonId / 3) || 1;
+        } else if (!courseIdNum) {
+          courseIdNum = 1;
+        }
+
+        const matchedCourse = Array.isArray(backendCourses)
+          ? backendCourses.find(c => c.id === courseIdNum) || backendCourses[0]
+          : null;
+
+        const mockCourseFallback = MOCK_COURSES.find(m => m.id === String(courseIdNum) || m.category === matchedCourse?.category) || MOCK_COURSES[0];
+
+        // Fetch backend lessons for this course from GET /lessons/{course_id}
+        let backendLessons = [];
+        try {
+          const lRes = await getCourseLessons(courseIdNum);
+          if (Array.isArray(lRes) && lRes.length > 0) {
+            backendLessons = lRes;
+          }
+        } catch (lErr) {
+          console.warn('[LessonPlayer] Failed to load backend lessons:', lErr);
+        }
+
+        if (backendLessons.length > 0) {
+          // Find matching lesson
+          let activeLesson = backendLessons.find(l => String(l.id) === String(lessonId));
+          if (!activeLesson) {
+            activeLesson = backendLessons[0];
+          }
+
+          const formattedLessons = backendLessons.map((bl, idx) => ({
+            id: String(bl.id),
+            courseId: courseIdNum,
+            title: bl.title || `Lesson ${idx + 1}`,
+            duration: "15 mins",
+            completed: false,
+            locked: false,
+            videoUrl: bl.video_url,
+            videoPoster: mockCourseFallback.thumbnail,
+            notes: bl.content || "Practice hand movements and observe posture carefully.",
+            resources: [
+              { name: "Key Hand Shapes Guide (PDF)", type: "PDF", size: "1.2 MB", url: "#" },
+              { name: "Sign Assessment Rubric", type: "Guide", size: "840 KB", url: "#" }
+            ]
+          }));
+
+          const activeFormatted = formattedLessons.find(fl => fl.id === String(activeLesson.id)) || formattedLessons[0];
+
+          const fullLessonData = {
+            lesson: activeFormatted,
+            module: {
+              id: `mod-${courseIdNum}-1`,
+              title: "Core Curriculum & Hands-on Demonstrations",
+              duration: `${formattedLessons.length * 15} mins`,
+              lessons: formattedLessons
+            },
+            course: {
+              ...mockCourseFallback,
+              id: courseIdNum,
+              title: matchedCourse?.title || mockCourseFallback.title,
+              category: matchedCourse?.category || mockCourseFallback.category,
+              difficulty: matchedCourse?.level || mockCourseFallback.difficulty,
+              description: matchedCourse?.description || mockCourseFallback.description,
+              modules: [
+                {
+                  id: `mod-${courseIdNum}-1`,
+                  title: "Core Curriculum & Hands-on Demonstrations",
+                  duration: `${formattedLessons.length * 15} mins`,
+                  lessons: formattedLessons
+                }
+              ]
+            }
+          };
+
+          if (isMounted) {
+            setLessonData(fullLessonData);
+            setIsCompleted(false);
+          }
+          return;
+        }
+
+        // Fallback to local mock if backend had no lessons
+        const mockData = getLessonById(lessonId);
+        if (isMounted && mockData) {
+          setLessonData(mockData);
+          setIsCompleted(!!mockData.lesson.completed);
+        }
+      } catch (err) {
+        console.warn('[LessonPlayer] Backend fetch error, using fallback:', err);
+        const mockData = getLessonById(lessonId);
+        if (isMounted && mockData) {
+          setLessonData(mockData);
+          setIsCompleted(!!mockData.lesson.completed);
+        }
+      }
     }
-  }, [lessonId]);
+
+    fetchBackendLesson();
+    return () => { isMounted = false; };
+  }, [lessonId, searchParams, location.state]);
 
   if (!lessonData || !lessonData.lesson) {
     return (
@@ -143,55 +254,71 @@ export default function LessonPlayerPage() {
             className="relative rounded-3xl overflow-hidden glass-strong border border-white/10 aspect-video w-full flex items-center justify-center group"
             style={{ boxShadow: '0 24px 60px rgba(0,0,0,0.6)' }}
           >
-            {/* Background Video Poster Image */}
-            <img
-              src={lesson.videoPoster || course.thumbnail}
-              alt={lesson.title}
-              className="absolute inset-0 w-full h-full object-cover filter brightness-75 group-hover:scale-102 transition-transform duration-500"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-
-            {/* AI Gesture Tracking Grid Overlay */}
-            <div className="absolute inset-0 pointer-events-none opacity-20 border-2 border-purple-500/30 rounded-3xl m-4 flex items-center justify-center">
-              <div className="w-48 h-48 border border-dashed border-purple-400/50 rounded-full animate-ping opacity-25" />
-            </div>
-
-            {/* Center Play Button Overlay */}
-            <button
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="relative z-10 w-20 h-20 rounded-full bg-purple-600/80 hover:bg-purple-500 border-2 border-white/40 flex items-center justify-center text-white shadow-2xl shadow-purple-900/60 transform group-hover:scale-110 transition-all duration-300"
-            >
-              {isPlaying ? (
-                <Pause className="w-8 h-8 fill-white" />
-              ) : (
-                <Play className="w-8 h-8 fill-white ml-1" />
-              )}
-            </button>
-
-            {/* Video Controls Bottom Bar */}
-            <div className="absolute bottom-0 inset-x-0 p-4 md:p-6 bg-gradient-to-t from-black via-black/80 to-transparent flex flex-col gap-3 z-10">
-              <div className="w-full bg-white/20 h-1.5 rounded-full cursor-pointer relative overflow-hidden">
-                <div className="bg-purple-500 h-full w-2/5 rounded-full" />
+            {isPlaying && lesson.videoUrl ? (
+              <div className="relative w-full h-full">
+                <iframe
+                  src={`${lesson.videoUrl}?autoplay=1&rel=0`}
+                  title={lesson.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="w-full h-full border-0"
+                />
+                <button
+                  onClick={() => setIsPlaying(false)}
+                  className="absolute top-4 right-4 z-30 px-3 py-1.5 rounded-xl glass border border-white/20 text-xs font-semibold text-white/80 hover:text-white bg-black/60 hover:bg-black/80 transition-colors"
+                >
+                  ✕ Close Video
+                </button>
               </div>
+            ) : (
+              <>
+                {/* Background Video Poster Image */}
+                <img
+                  src={lesson.videoPoster || course.thumbnail}
+                  alt={lesson.title}
+                  className="absolute inset-0 w-full h-full object-cover filter brightness-75 group-hover:scale-102 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
 
-              <div className="flex items-center justify-between text-xs text-white/80">
-                <div className="flex items-center gap-3">
-                  <button onClick={() => setIsPlaying(!isPlaying)} className="hover:text-white">
-                    {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                  </button>
-                  <Volume2 className="w-4 h-4 text-white/60" />
-                  <span>02:45 / {lesson.duration}</span>
+                {/* AI Gesture Tracking Grid Overlay */}
+                <div className="absolute inset-0 pointer-events-none opacity-20 border-2 border-purple-500/30 rounded-3xl m-4 flex items-center justify-center">
+                  <div className="w-48 h-48 border border-dashed border-purple-400/50 rounded-full animate-ping opacity-25" />
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/30 border border-purple-400/40 text-purple-200">
-                    AI Gesture Overlay Active
-                  </span>
-                  <Settings className="w-4 h-4 text-white/60 cursor-pointer hover:text-white" />
-                  <Maximize className="w-4 h-4 text-white/60 cursor-pointer hover:text-white" />
+                {/* Center Play Button Overlay */}
+                <button
+                  onClick={() => setIsPlaying(true)}
+                  className="relative z-10 w-20 h-20 rounded-full bg-purple-600/80 hover:bg-purple-500 border-2 border-white/40 flex items-center justify-center text-white shadow-2xl shadow-purple-900/60 transform group-hover:scale-110 transition-all duration-300"
+                >
+                  <Play className="w-8 h-8 fill-white ml-1" />
+                </button>
+
+                {/* Video Controls Bottom Bar */}
+                <div className="absolute bottom-0 inset-x-0 p-4 md:p-6 bg-gradient-to-t from-black via-black/80 to-transparent flex flex-col gap-3 z-10">
+                  <div className="w-full bg-white/20 h-1.5 rounded-full cursor-pointer relative overflow-hidden">
+                    <div className="bg-purple-500 h-full w-2/5 rounded-full" />
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs text-white/80">
+                    <div className="flex items-center gap-3">
+                      <button onClick={() => setIsPlaying(true)} className="hover:text-white">
+                        <Play className="w-4 h-4" />
+                      </button>
+                      <Volume2 className="w-4 h-4 text-white/60" />
+                      <span>{lesson.duration || "15 mins"} · Click to play video</span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/30 border border-purple-400/40 text-purple-200">
+                        Educational ASL Video
+                      </span>
+                      <Settings className="w-4 h-4 text-white/60 cursor-pointer hover:text-white" />
+                      <Maximize className="w-4 h-4 text-white/60 cursor-pointer hover:text-white" />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </>
+            )}
           </motion.div>
 
           {/* ─── LESSON HEADER & PRACTICE ACTION ROW ───────────────── */}
@@ -311,7 +438,7 @@ export default function LessonPlayerPage() {
           <div className="flex items-center justify-between gap-4 pt-4 border-t border-white/10">
             {prevLesson ? (
               <button
-                onClick={() => navigate(`/learn/${prevLesson.id}`)}
+                onClick={() => navigate(`/learn/${prevLesson.id}?courseId=${course.id}`)}
                 className="glass px-5 py-3 rounded-2xl border border-white/10 hover:border-purple-500/40 text-xs font-semibold flex items-center gap-2 text-white/80 hover:text-white transition-all"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -321,7 +448,7 @@ export default function LessonPlayerPage() {
 
             {nextLesson ? (
               <button
-                onClick={() => navigate(`/learn/${nextLesson.id}`)}
+                onClick={() => navigate(`/learn/${nextLesson.id}?courseId=${course.id}`)}
                 className="btn-primary text-xs flex items-center gap-2"
                 style={{ padding: '12px 24px' }}
               >
@@ -367,71 +494,71 @@ export default function LessonPlayerPage() {
             >
               <div className="flex items-center justify-between border-b border-white/10 pb-4">
                 <div className="flex items-center gap-2">
-                  <Camera className="w-5 h-5 text-purple-400" />
-                  <h3 className="font-space font-bold text-lg text-white">AI Gesture Practice Drill</h3>
+                  <Cpu className="w-5 h-5 text-purple-400" />
+                  <h3 className="font-space font-bold text-lg text-white">AI Gesture Practice & Evaluation</h3>
                 </div>
                 <button
-                  onClick={() => {
-                    setShowPracticeModal(false);
-                    setPracticeStatus('idle');
-                  }}
+                  onClick={() => setShowPracticeModal(false)}
                   className="text-xs text-white/50 hover:text-white px-2 py-1"
                 >
                   ✕ Close
                 </button>
               </div>
 
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-4">
                 <p className="text-xs text-white/70">
-                  <strong>Task Prompt:</strong> {lesson.practicePrompt || 'Perform the requested sign in front of the camera.'}
+                  Practice sign gestures live using real-time computer vision and the active FastAPI AI recognition backend.
                 </p>
 
-                {/* Simulated Webcam Vision Window */}
-                <div className="relative h-64 rounded-2xl bg-black border border-white/10 overflow-hidden flex items-center justify-center">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-purple-900/20 to-blue-900/20 opacity-60" />
-                  <div className="absolute inset-4 border border-dashed border-purple-400/40 rounded-xl pointer-events-none flex items-center justify-center">
-                    <span className="text-[10px] text-purple-300/60 uppercase tracking-widest">Hand Alignment Zone</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Live Assessment Option */}
+                  <div className="p-5 rounded-2xl glass border border-purple-500/30 flex flex-col justify-between gap-4">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2 text-purple-300 font-semibold text-xs">
+                        <Camera className="w-4 h-4" />
+                        <span>Live Assessment HUD</span>
+                      </div>
+                      <p className="text-[11px] text-white/60">
+                        Multi-dimensional grading on hand shape, motion, position, and timing with instant scoring.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => navigate(`/assessment?lessonId=${lesson.id}`)}
+                      className="btn-primary text-xs flex items-center justify-center gap-2 py-2"
+                    >
+                      <span>Start Assessment</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </button>
                   </div>
 
-                  {practiceStatus === 'idle' && (
-                    <div className="flex flex-col items-center gap-3 z-10 text-center px-4">
-                      <Camera className="w-10 h-10 text-purple-400 animate-pulse" />
-                      <span className="text-xs text-white/70">Ready to start AI gesture detection</span>
-                      <button
-                        onClick={handleRunPractice}
-                        className="btn-primary text-xs"
-                      >
-                        Start Camera Scan
-                      </button>
+                  {/* 4-Model Engine Option */}
+                  <div className="p-5 rounded-2xl glass border border-blue-500/30 flex flex-col justify-between gap-4">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2 text-blue-300 font-semibold text-xs">
+                        <Cpu className="w-4 h-4" />
+                        <span>4-Model Gesture Studio</span>
+                      </div>
+                      <p className="text-[11px] text-white/60">
+                        Real-time landmark classification across CNN, LSTM, Transformer, and Scikit-Learn models.
+                      </p>
                     </div>
-                  )}
-
-                  {practiceStatus === 'detecting' && (
-                    <div className="flex flex-col items-center gap-3 z-10">
-                      <RefreshCw className="w-8 h-8 text-purple-400 animate-spin" />
-                      <span className="text-xs text-purple-300 font-semibold">Sign Language AI Vision Engine Analyzing Sign...</span>
-                    </div>
-                  )}
-
-                  {practiceStatus === 'success' && (
-                    <div className="flex flex-col items-center gap-3 z-10 text-center p-4">
-                      <CheckCircle className="w-12 h-12 text-emerald-400" />
-                      <span className="text-base font-bold text-white">98.4% Match Accuracy!</span>
-                      <span className="text-xs text-emerald-300">Perfect Handshape & Landmark Alignment</span>
-                    </div>
-                  )}
+                    <button
+                      onClick={() => navigate('/gesture-recognition')}
+                      className="bg-white/10 hover:bg-white/20 text-white border border-white/15 text-xs font-semibold rounded-2xl flex items-center justify-center gap-2 py-2 transition-all"
+                    >
+                      <span>Open Gesture Studio</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
 
               <div className="flex justify-end gap-3 pt-2">
                 <button
-                  onClick={() => {
-                    setShowPracticeModal(false);
-                    setPracticeStatus('idle');
-                  }}
+                  onClick={() => setShowPracticeModal(false)}
                   className="btn-secondary text-xs"
                 >
-                  Done
+                  Close
                 </button>
               </div>
             </motion.div>

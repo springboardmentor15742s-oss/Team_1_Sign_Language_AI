@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { evaluateAssessment } from '../api/api';
+import { evaluateAssessment, getAssessmentHistory, getAssessmentSummary } from '../api/api';
+import { useAuth } from '../context/AuthContext';
 
 import AssessmentHeader   from '../components/assessment/AssessmentHeader';
 import ReferenceGestureCard from '../components/assessment/ReferenceGestureCard';
@@ -62,6 +63,7 @@ function LevelSelector({ levels, selected, onSelect, disabled }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function AssessmentPage() {
+  const { user } = useAuth();
   const [level, setLevel]               = useState(ASSESSMENT_LEVELS[0]);
   const [gestureIndex, setGestureIndex] = useState(0);
   const [captureState, setCaptureState] = useState('idle');    // idle|ready|recording|processing|done
@@ -78,6 +80,44 @@ export default function AssessmentPage() {
   const currentGesture = ASSESSMENT_GESTURES[gestureIndex] || null;
   const totalGestures  = level.total;
   const progress       = Math.min(gestureIndex, totalGestures);
+
+  // ─── Load live assessment history & summary from PostgreSQL backend ───────
+  useEffect(() => {
+    let isMounted = true;
+    const uid = user?.id || 1;
+    Promise.allSettled([
+      getAssessmentHistory(uid),
+      getAssessmentSummary(uid)
+    ]).then(([histRes, sumRes]) => {
+      if (!isMounted) return;
+      if (histRes.status === 'fulfilled' && Array.isArray(histRes.value) && histRes.value.length > 0) {
+        const mapped = histRes.value.map(h => ({
+          id: h.id,
+          gesture: h.gesture || 'HELLO',
+          accuracy: Math.round(h.accuracy || 75),
+          attempt: 1,
+          time: h.created_at ? new Date(h.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : getTimestamp(),
+          result: h.result || ((h.accuracy || 0) >= 70 ? 'Pass' : 'Fail'),
+          color: (h.accuracy || 0) >= 70 ? [34, 197, 94] : [239, 68, 68]
+        }));
+        setHistory(mapped);
+      }
+      if (sumRes.status === 'fulfilled' && sumRes.value && sumRes.value.attempted > 0) {
+        const s = sumRes.value;
+        setSummary({
+          attempted: s.attempted,
+          passed: s.passed,
+          failed: s.failed,
+          avgAccuracy: s.avg_accuracy,
+          bestScore: s.best_score,
+          currentStreak: s.current_streak
+        });
+      }
+    }).catch(err => {
+      console.warn('[Assessment] Live history fetch error:', err);
+    });
+    return () => { isMounted = false; };
+  }, [user]);
 
   // ─── Timer ────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -99,7 +139,7 @@ export default function AssessmentPage() {
       setSessionStatus('Processing');
       try {
         const apiRes = await evaluateAssessment({
-          user_id: 1,
+          user_id: user?.id || 1,
           gesture_name: currentGesture?.name || 'HELLO',
           expected_sign: currentGesture?.name || 'HELLO'
         });

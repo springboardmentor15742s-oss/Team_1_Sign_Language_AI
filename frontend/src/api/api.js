@@ -13,8 +13,9 @@ export async function apiRequest(
         headers["Content-Type"] = "application/json";
     }
 
-    if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
+    const activeToken = token || localStorage.getItem("token");
+    if (activeToken) {
+        headers["Authorization"] = `Bearer ${activeToken}`;
     }
 
     const options = {
@@ -29,8 +30,21 @@ export async function apiRequest(
     try {
         const response = await fetch(`${API_URL}${endpoint}`, options);
         if (!response.ok) {
-            const errText = await response.text();
-            throw new Error(`API Error ${response.status}: ${errText}`);
+            let errorDetail = `API Error ${response.status}`;
+            try {
+                const errJson = await response.json();
+                if (errJson && errJson.detail) {
+                    errorDetail = typeof errJson.detail === "string"
+                        ? errJson.detail
+                        : JSON.stringify(errJson.detail);
+                } else if (errJson && errJson.message) {
+                    errorDetail = errJson.message;
+                }
+            } catch {
+                const errText = await response.text();
+                if (errText) errorDetail = errText;
+            }
+            throw new Error(errorDetail);
         }
         return await response.json();
     } catch (error) {
@@ -112,4 +126,31 @@ export async function getDatasetDetails(datasetId) {
 
 export async function getDatasetSamples(datasetId) {
     return apiRequest(`/datasets/${datasetId}/samples`, "GET");
-}
+}
+
+// ─── Course & Lesson Management APIs ─────────────────────────────────────────
+export async function getCourses(skip = 0, limit = 50) {
+    return apiRequest(`/courses/?skip=${skip}&limit=${limit}`, "GET");
+}
+
+export async function getCourseLessons(courseId) {
+    return apiRequest(`/lessons/${courseId}`, "GET");
+}
+
+// ─── Role Dashboard APIs ──────────────────────────────────────────────────────
+export async function getLearnerDashboard(userId = 1) {
+    return apiRequest(`/dashboard/learner/${userId}`, "GET");
+}
+
+export async function getInstructorDashboard() {
+    return apiRequest("/dashboard/instructor", "GET");
+}
+
+export async function getTrainerDashboard() {
+    return apiRequest("/dashboard/trainer", "GET");
+}
+
+export async function getAdminDashboard() {
+    return apiRequest("/dashboard/admin", "GET");
+}
+

@@ -14,7 +14,10 @@ export default function LessonCard({ lesson, index, isActive = false }) {
       whileHover={!isLocked ? { scale: 1.01 } : {}}
       onClick={() => {
         if (!isLocked) {
-          navigate(`/learn/${lesson.id}`);
+          const targetUrl = lesson.courseId
+            ? `/learn/${lesson.id}?courseId=${lesson.courseId}`
+            : `/learn/${lesson.id}`;
+          navigate(targetUrl, { state: { courseId: lesson.courseId, lessonId: lesson.id } });
         }
       }}
       className={`glass rounded-2xl p-4 border transition-all duration-200 flex items-center justify-between gap-4 ${

@@ -17,7 +17,8 @@ import {
   ChevronRight
 } from 'lucide-react';
 
-import { getCourseById } from '../data/courses';
+import { getCourseById, MOCK_COURSES } from '../data/courses';
+import { getCourses, getCourseLessons } from '../api/api';
 import LearningPath from '../components/course/LearningPath';
 import LessonCard from '../components/course/LessonCard';
 
@@ -31,11 +32,84 @@ export default function CourseDetailsPage() {
   const [isBookmarked, setIsBookmarked] = useState(false);
 
   useEffect(() => {
-    const foundCourse = getCourseById(id);
-    if (foundCourse) {
-      setCourse(foundCourse);
-      setIsEnrolled(foundCourse.progress > 0);
+    let isMounted = true;
+
+    async function loadCourseData() {
+      try {
+        const backendCourses = await getCourses();
+        if (!isMounted) return;
+
+        // Find matching course from backend
+        let matched = null;
+        if (Array.isArray(backendCourses)) {
+          matched = backendCourses.find(c => String(c.id) === String(id)) ||
+                    backendCourses.find(c => c.category === id || c.title === id);
+        }
+
+        const courseIdNum = matched?.id ? Number(matched.id) : (Number(id) || 1);
+        const mockFallback = MOCK_COURSES.find(m => m.id === id || m.category === matched?.category) || MOCK_COURSES[0];
+
+        // Fetch lessons from backend GET /lessons/{course_id}
+        let backendLessons = [];
+        try {
+          const lessonsRes = await getCourseLessons(courseIdNum);
+          if (Array.isArray(lessonsRes) && lessonsRes.length > 0) {
+            backendLessons = lessonsRes;
+          }
+        } catch (lErr) {
+          console.warn('[CourseDetails] Lessons fetch error:', lErr);
+        }
+
+        // Build modules using backend lessons
+        const modules = backendLessons.length > 0 ? [
+          {
+            id: `mod-${courseIdNum}-1`,
+            title: `Core Curriculum & Hands-on Demonstrations`,
+            duration: `${backendLessons.length * 15} mins`,
+            lessons: backendLessons.map((bl, idx) => ({
+              id: String(bl.id),
+              courseId: courseIdNum,
+              title: bl.title || `Lesson ${idx + 1}`,
+              duration: "15 mins",
+              completed: false,
+              locked: false,
+              videoUrl: bl.video_url,
+              videoPoster: mockFallback.thumbnail,
+              notes: bl.content || "Practice hand movements and observe posture carefully.",
+              resources: [
+                { name: "Key Hand Shapes Guide (PDF)", type: "PDF", size: "1.2 MB", url: "#" },
+                { name: "AI Practice Checklist", type: "Guide", size: "640 KB", url: "#" }
+              ]
+            }))
+          }
+        ] : (mockFallback.modules || []);
+
+        const hydratedCourse = {
+          ...mockFallback,
+          id: courseIdNum,
+          title: matched?.title || mockFallback.title,
+          category: matched?.category || mockFallback.category,
+          difficulty: matched?.level || mockFallback.difficulty,
+          description: matched?.description || mockFallback.description,
+          modules,
+        };
+
+        if (isMounted) {
+          setCourse(hydratedCourse);
+          setIsEnrolled(hydratedCourse.progress > 0);
+        }
+      } catch (err) {
+        console.warn('[CourseDetails] Error loading course, using mock fallback:', err);
+        const fallback = getCourseById(id) || MOCK_COURSES[0];
+        if (isMounted) {
+          setCourse(fallback);
+          setIsEnrolled(fallback.progress > 0);
+        }
+      }
     }
+
+    loadCourseData();
+    return () => { isMounted = false; };
   }, [id]);
 
   if (!course) {
@@ -48,11 +122,14 @@ export default function CourseDetailsPage() {
 
   // Get total lessons count
   const totalLessons = course.modules?.reduce((acc, m) => acc + (m.lessons?.length || 0), 0) || 0;
-  const firstLessonId = course.modules?.[0]?.lessons?.[0]?.id || 'les-101-1';
+  const firstLesson = course.modules?.[0]?.lessons?.[0];
+  const firstLessonId = firstLesson?.id || '1';
 
   const handleEnrollOrStart = () => {
     setIsEnrolled(true);
-    navigate(`/learn/${firstLessonId}`);
+    navigate(`/learn/${firstLessonId}?courseId=${course.id}`, {
+      state: { courseId: course.id, lessonId: firstLessonId }
+    });
   };
 
   return (

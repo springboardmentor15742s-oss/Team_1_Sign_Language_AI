@@ -65,7 +65,7 @@ export const MOCK_COURSES = [
             duration: "15 mins",
             completed: true,
             locked: false,
-            videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", // Placeholder embedded video fallback
+            videoUrl: "https://www.youtube.com/embed/v1desDduz5M", // Placeholder embedded video fallback
             videoPoster: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80",
             notes: "Keep your dominant hand positioned comfortably in front of your shoulder. Focus on clean knuckle bends for letters 'E' and 'M'. Maintain static hand positioning without excessive wrist shaking.",
             resources: [
@@ -80,7 +80,7 @@ export const MOCK_COURSES = [
             duration: "20 mins",
             completed: true,
             locked: false,
-            videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            videoUrl: "https://www.youtube.com/embed/UPKPm4j2wzE",
             videoPoster: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80",
             notes: "Pay special attention to the dynamic movement in 'Z' (drawing in the air) and 'J' (curving the pinky). Ensure clear visibility under good lighting.",
             resources: [
@@ -94,7 +94,7 @@ export const MOCK_COURSES = [
             duration: "25 mins",
             completed: true,
             locked: false,
-            videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            videoUrl: "https://www.youtube.com/embed/0FcwzMq4iWg",
             videoPoster: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
             notes: "Clarity is more important than speed. Avoid bouncing your hand between letters. Smooth transitions build natural sign fluency.",
             resources: [
@@ -115,7 +115,7 @@ export const MOCK_COURSES = [
             duration: "18 mins",
             completed: true,
             locked: false,
-            videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            videoUrl: "https://www.youtube.com/embed/ianCxy7VAC8",
             videoPoster: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=800&q=80",
             notes: "'Hello' starts near the forehead with an open palm moving outward gently. Combine with a warm, welcoming facial expression.",
             resources: [
@@ -129,7 +129,7 @@ export const MOCK_COURSES = [
             duration: "22 mins",
             completed: false,
             locked: false,
-            videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            videoUrl: "https://www.youtube.com/embed/k74YS_p9kK8",
             videoPoster: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80",
             notes: "'Thank You' moves from fingertips touching chin outward toward the receiver. Ensure your chin gesture is smooth.",
             resources: [
@@ -143,7 +143,7 @@ export const MOCK_COURSES = [
             duration: "30 mins",
             completed: false,
             locked: true,
-            videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            videoUrl: "https://www.youtube.com/embed/Raa0vBXA8OQ",
             videoPoster: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=800&q=80",
             notes: "Questions in ASL require raised eyebrows (for WH-questions vs Y/N questions). Practice facial movements simultaneously.",
             resources: [
@@ -207,7 +207,7 @@ export const MOCK_COURSES = [
             duration: "20 mins",
             completed: true,
             locked: false,
-            videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            videoUrl: "https://www.youtube.com/embed/3qZ2iQ94QeE",
             videoPoster: "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=800&q=80",
             notes: "Male signs are positioned near the forehead; female signs are positioned near the chin. Keep gender locations consistent.",
             resources: [
@@ -221,7 +221,7 @@ export const MOCK_COURSES = [
             duration: "25 mins",
             completed: false,
             locked: false,
-            videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            videoUrl: "https://www.youtube.com/embed/v1desDduz5M",
             videoPoster: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
             notes: "Adjectives usually follow nouns in ASL sentence structure. Practice 'Person + Tall + Friendly'.",
             resources: [
@@ -285,7 +285,7 @@ export const MOCK_COURSES = [
             duration: "30 mins",
             completed: true,
             locked: false,
-            videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            videoUrl: "https://www.youtube.com/embed/0FcwzMq4iWg",
             videoPoster: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80",
             notes: "Computer is signed with a 'C' handshape moving along the forearm. Technology uses the middle finger tapping the side of the non-dominant palm.",
             resources: [
@@ -299,7 +299,7 @@ export const MOCK_COURSES = [
             duration: "25 mins",
             completed: false,
             locked: false,
-            videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            videoUrl: "https://www.youtube.com/embed/v1desDduz5M",
             videoPoster: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80",
             notes: "'Goal', 'Deadline', 'Task', and 'Finished' signs are key for daily standup updates.",
             resources: [
@@ -358,7 +358,7 @@ export const MOCK_COURSES = [
             duration: "20 mins",
             completed: false,
             locked: false,
-            videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            videoUrl: "https://www.youtube.com/embed/UPKPm4j2wzE",
             videoPoster: "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=800&q=80",
             notes: "Math signs utilize double-tap motions with 'M' handshapes. Science uses rotating 'S' handshapes.",
             resources: [
@@ -417,7 +417,7 @@ export const MOCK_COURSES = [
             duration: "35 mins",
             completed: false,
             locked: false,
-            videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            videoUrl: "https://www.youtube.com/embed/0FcwzMq4iWg",
             videoPoster: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80",
             notes: "Classifiers replace nouns to depict movement, location, size, and shape in 3D space.",
             resources: [
@@ -476,7 +476,7 @@ export const MOCK_COURSES = [
             duration: "25 mins",
             completed: false,
             locked: false,
-            videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            videoUrl: "https://www.youtube.com/embed/ianCxy7VAC8",
             videoPoster: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80",
             notes: "Directional verbs incorporate subject and object into a single continuous sign movement.",
             resources: [

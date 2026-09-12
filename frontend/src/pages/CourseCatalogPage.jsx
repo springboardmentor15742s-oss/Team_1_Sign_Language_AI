@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, BookOpen, Flame, Award, ArrowRight, Layers } from 'lucide-react';
+import { Sparkles, BookOpen, Flame, Award, ArrowRight, Layers, Database } from 'lucide-react';
 
 import {
   MOCK_COURSES,
@@ -11,6 +11,7 @@ import {
   getPopularCourses,
   getRecentlyViewedCourses
 } from '../data/courses';
+import { getCourses } from '../api/api';
 
 import CourseCard from '../components/course/CourseCard';
 import CategoryFilter from '../components/course/CategoryFilter';
@@ -20,13 +21,41 @@ import EmptyState from '../components/course/EmptyState';
 export default function CourseCatalogPage() {
   const navigate = useNavigate();
 
+  const [coursesList, setCoursesList] = useState(MOCK_COURSES);
+  const [backendSynced, setBackendSynced] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All Categories');
   const [selectedDifficulty, setSelectedDifficulty] = useState('All');
 
+  useEffect(() => {
+    let isMounted = true;
+    getCourses()
+      .then((backendCourses) => {
+        if (!isMounted || !Array.isArray(backendCourses) || backendCourses.length === 0) return;
+        const merged = backendCourses.map((bc, idx) => {
+          const mockMatch = MOCK_COURSES.find(m => m.category === bc.category || m.title === bc.title) || MOCK_COURSES[idx % MOCK_COURSES.length];
+          return {
+            ...mockMatch,
+            id: bc.id,
+            dbId: bc.id,
+            title: bc.title || mockMatch.title,
+            category: bc.category || mockMatch.category,
+            description: bc.description || mockMatch.description,
+            difficulty: bc.level || mockMatch.difficulty,
+          };
+        });
+        setCoursesList(merged);
+        setBackendSynced(true);
+      })
+      .catch((err) => {
+        console.warn('Backend courses fetch error, using cached mock:', err);
+      });
+    return () => { isMounted = false; };
+  }, []);
+
   // Filter logic
   const filteredCourses = useMemo(() => {
-    return MOCK_COURSES.filter((course) => {
+    return coursesList.filter((course) => {
       // Category Filter
       const matchesCategory =
         activeCategory === 'All Categories' || course.category === activeCategory;
@@ -46,23 +75,23 @@ export default function CourseCatalogPage() {
 
       return matchesCategory && matchesDifficulty && matchesSearch;
     });
-  }, [searchQuery, activeCategory, selectedDifficulty]);
+  }, [coursesList, searchQuery, activeCategory, selectedDifficulty]);
 
   // Category counts map
   const categoryCounts = useMemo(() => {
-    const counts = { 'All Categories': MOCK_COURSES.length };
+    const counts = { 'All Categories': coursesList.length };
     COURSE_CATEGORIES.forEach((cat) => {
       if (cat !== 'All Categories') {
-        counts[cat] = MOCK_COURSES.filter((c) => c.category === cat).length;
+        counts[cat] = coursesList.filter((c) => c.category === cat).length;
       }
     });
     return counts;
-  }, []);
+  }, [coursesList]);
 
-  const continueCourses = useMemo(() => getContinueLearningCourses(), []);
-  const recommendedCourses = useMemo(() => getRecommendedCourses(), []);
-  const popularCourses = useMemo(() => getPopularCourses(), []);
-  const recentlyViewed = useMemo(() => getRecentlyViewedCourses(), []);
+  const continueCourses = useMemo(() => coursesList.filter(c => c.progress > 0 && c.progress < 100), [coursesList]);
+  const recommendedCourses = useMemo(() => coursesList.filter(c => c.isRecommended), [coursesList]);
+  const popularCourses = useMemo(() => coursesList.filter(c => c.isPopular), [coursesList]);
+  const recentlyViewed = useMemo(() => coursesList.filter(c => c.isRecentlyViewed), [coursesList]);
 
   const handleResetFilters = () => {
     setSearchQuery('');
@@ -100,6 +129,12 @@ export default function CourseCatalogPage() {
             <span className="text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider text-blue-300 bg-blue-500/15 border border-blue-500/30">
               Interactive Sign Catalog
             </span>
+            {backendSynced && (
+              <span className="text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                PostgreSQL Live Data
+              </span>
+            )}
           </div>
 
           <h1 className="text-3xl md:text-5xl font-space font-extrabold tracking-tight text-white leading-tight">
