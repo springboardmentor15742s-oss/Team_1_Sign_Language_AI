@@ -1,253 +1,159 @@
-# 🤟 AI Sign Language learning and Assessment Platform (Frontend)
+# 🤟 AI Sign Language Learning and Assessment Platform
 
-A modern AI-powered Sign Language Learning Platform designed to help learners practice sign language through an interactive and responsive web interface.
+A modern AI-powered Sign Language Learning and Assessment Platform designed to provide learners with an interactive environment for learning, practicing, assessing, and tracking sign language skills.
 
-> **Current Status:** Frontend completed and ready for backend API integration.
+The frontend is built using **React and Vite** and is integrated with a **FastAPI backend** and **PostgreSQL database** for core application workflows such as authentication, courses, lessons, assessments, gesture prediction, dashboards, performance tracking, and certification.
 
 ---
 
-# 📌 Project Overview
+## 📌 Project Overview
 
-The Sign Language AI Platform provides an engaging learning environment where users can:
+The **AI Sign Language Learning and Assessment Platform** aims to make sign language learning more interactive and accessible by combining structured learning content with AI-assisted gesture recognition and assessment.
 
-- Learn sign language through structured courses
-- Practice gestures
-- Track learning progress
+The platform provides different role-based interfaces for learners, instructors, accessibility trainers, and administrators.
+
+Learners can:
+
+- Create and access their accounts
+- Explore sign language courses
+- View structured lessons
+- Watch educational sign language videos
+- Practice sign language gestures
+- Perform AI-assisted gesture recognition
 - Take assessments
-- View performance analytics
-- Earn certificates
-- Access role-based dashboards
+- View assessment scores
+- Track learning performance
+- View reports and learning information
+- Access certificates
 
-The frontend has been developed using React and currently uses structured mock data. Backend APIs will be integrated in the next phase.
+The frontend communicates with the FastAPI backend through REST APIs. PostgreSQL is used by the backend for persistent application data.
+
+Some presentation-oriented features continue to use local/static frontend data where corresponding backend services are not currently available.
 
 ---
 
-# ✨ Features
+# ✨ Key Features
 
 ## 🔐 Authentication
-- Login
-- Register
-- Forgot Password
-- OTP Verification
-- Reset Password
+
+The platform provides authentication functionality integrated with the backend.
+
+Features include:
+
+- User Login
+- User Registration
+- JWT-based authentication
+- Authenticated API requests
+- Forgot Password interface
+- OTP Verification interface
+- Password Reset interface
+
+The frontend stores and uses the authentication token when communicating with protected backend APIs.
+
+---
 
 ## 👥 Role-Based Access
-- Learner Dashboard
-- Instructor Dashboard
-- Accessibility Trainer Dashboard
-- Administrator Dashboard
 
-## 📚 Learning Modules
-- Course Management
-- Lesson Pages
-- Learning Progress
+The platform supports different user roles and dashboards.
+
+### 👨‍🎓 Learner
+
+Learners can:
+
+- Access their dashboard
+- Browse courses
+- View lessons
+- Watch learning videos
+- Practice gestures
+- Take assessments
+- View performance
+- Access certificates
+
+### 👨‍🏫 Instructor
+
+Instructors have access to an instructor-oriented dashboard for monitoring learning-related information.
+
+### ♿ Accessibility Trainer
+
+Trainers have a dedicated dashboard for accessibility and learner-support workflows.
+
+### 👨‍💼 Administrator
+
+Administrators have access to an administration dashboard for platform-level information.
+
+---
+
+# 📚 Learning Modules
+
+The learning section provides structured sign language learning content.
+
+Features include:
+
+- Course Catalog
+- Course Details
+- Structured Lessons
+- Lesson Navigation
+- Interactive Course Sidebar
+- Educational Video Lessons
+- Previous/Next Lesson Navigation
+- Learning Progress Interface
 - Practice Sessions
-- Gesture Tracking (Frontend Simulation)
+- Gesture Recognition
 
-## 📊 Analytics & Reports
-- Performance Dashboard
-- Learning Intelligence
-- Reports
-- Assessment Results
-- Progress Tracking
-
-## 🏆 Assessment & Certification
-- Online Assessments
-- Assessment Results
-- Certificates
-- Performance Scoring
-
-## 🎨 User Interface
-- Responsive Design
-- Glassmorphism UI
-- Framer Motion Animations
-- Dark Theme
-- Reusable Components
+Course and lesson information is retrieved from the backend database where supported.
 
 ---
 
-# 🛠️ Technology Stack
+# 🎥 Educational Video Lessons
 
-- React
-- Vite
-- JavaScript (ES6+)
-- Tailwind CSS
-- React Router DOM
-- Framer Motion
-- Lucide React
+Lessons include educational sign language videos embedded from YouTube.
+
+The Lesson Player:
+
+- Loads lesson information dynamically
+- Displays the corresponding lesson video
+- Supports previous/next lesson navigation
+- Synchronizes the selected lesson with the course sidebar
+- Uses backend lesson data for video URLs
+
+The application uses verified educational sign language video resources rather than placeholder videos.
 
 ---
 
-# 📁 Project Structure
+# 🤖 AI Gesture Recognition
+
+The platform integrates the frontend with backend AI gesture prediction services.
+
+Supported model pipelines include:
+
+- CNN
+- LSTM / BiLSTM
+- Transformer
+- Scikit-Learn
+
+The frontend communicates with the backend for landmark-based gesture prediction and model status information.
+
+### Gesture Processing
+
+The gesture workflow can include:
 
 ```text
-frontend/
-│
-├── public/
-│
-├── src/
-│   ├── assets/
-│   ├── components/
-│   ├── context/
-│   ├── data/
-│   ├── layouts/
-│   ├── pages/
-│   ├── services/
-│   ├── utils/
-│   ├── App.jsx
-│   └── main.jsx
-│
-├── package.json
-├── vite.config.js
-└── README.md
-```
-
----
-
-# 🚀 Getting Started
-
-## Clone the Repository
-
-```bash
-git clone <repository-url>
-```
-
-## Navigate to the Project
-
-```bash
-cd frontend
-```
-
-## Install Dependencies
-
-```bash
-npm install
-```
-
-## Start Development Server
-
-```bash
-npm run dev
-```
-
-Open your browser and visit:
-
-```
-http://localhost:5173
-```
-
----
-
-# 📦 Build for Production
-
-```bash
-npm run build
-```
-
----
-
-# 📊 Modules Implemented
-
-- ✅ User Authentication
-- ✅ Role-Based Access Control
-- ✅ Learner Profile Management
-- ✅ Dashboard Modules
-- ✅ Course Management UI
-- ✅ Gesture Tracking UI
-- ✅ Learning Intelligence
-- ✅ Assessment Module
-- ✅ Certification Module
-- ✅ Performance Scoring
-- ✅ Reports Module
-- ✅ Responsive Navigation
-- ✅ Mock Data Integration
-
----
-
-# 🔄 Frontend Workflow
-
-```text
-Landing Page
-      │
-      ▼
-User Authentication
-      │
-      ▼
-Role Selection
-      │
-      ▼
-Role-Based Dashboard
-      │
-      ▼
-Learning Modules
-      │
-      ├── Courses
-      ├── Practice
-      ├── Tracking
-      ├── Assessments
-      ├── Performance
-      ├── Reports
-      └── Certificates
-```
-
----
-
-# 📂 Mock Data
-
-During frontend development, structured mock data is used to simulate backend responses.
-
-Location:
-
-```text
-src/data/
-```
-
-Examples:
-
-- dashboardData.js
-- trackingData.js
-- assessmentModuleData.js
-- performanceData.js
-- reportData.js
-- intelligenceData.js
-
-These files will be replaced with backend API responses during integration.
-
----
-
-# 🔗 Backend Integration
-
-The frontend is designed to integrate with a FastAPI backend.
-
-Integration will include:
-
-- User Authentication APIs
-- Profile APIs
-- Course APIs
-- Lesson APIs
-- Gesture Prediction APIs
-- Assessment APIs
-- Reports APIs
-- Certificate APIs
-- Progress Tracking APIs
-
----
-
-# 🧪 Current Status
-
-- Frontend Development: ✅ Completed
-- UI Testing: ✅ Completed
-- Mock Data Integration: ✅ Completed
-- Backend Integration: 🔄 In Progress
-
----
-
-# 👨‍💻 Team
-
-Developed as part of the **Sign Language AI Platform** project.
-
----
-
-# 📄 License
-
-This project is developed for educational and academic purposes.
+Camera / Gesture Input
+        │
+        ▼
+Hand / Pose Landmark Processing
+        │
+        ▼
+Landmark Data
+        │
+        ▼
+Backend Prediction API
+        │
+        ▼
+AI Model
+        │
+        ▼
+Prediction Result
+        │
+        ▼
+Frontend Result Display
