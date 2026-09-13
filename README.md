@@ -16,10 +16,9 @@ Before you begin, ensure you have the following installed:
 
 ## Setup Instructions (Windows)
 
+```powershell
 ### 1. Virtual Environment Setup
 Open a terminal in VS Code and run the following commands to set up the Python virtual environment:
-
-```powershell
 
 python -m venv venv
 venv\Scripts\activate
