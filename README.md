@@ -1,5 +1,3 @@
-Chaganti Sai Sasank -> Backend & integration work contributor
-
 A real-time Sign Language Recognition and Learning platform. This application combines a React frontend with a FastAPI backend, utilizing WebSockets for real-time gesture streaming and a suite of AI models for prediction.
 
 ## Architecture Overview
