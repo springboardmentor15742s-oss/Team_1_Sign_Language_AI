@@ -34,23 +34,23 @@ const navConfig = {
   ],
   'Instructor': [
     { id: 'dashboard', label: 'Dashboard', route: '/instructor-dashboard', icon: icons.dashboard },
-    { id: 'students', label: 'Students', route: '#', icon: icons.students },
-    { id: 'courses', label: 'Courses', route: '#', icon: icons.courses },
+    { id: 'students', label: 'Students', route: '/instructor-dashboard?tab=learners', icon: icons.students },
+    { id: 'courses', label: 'Courses', route: '/courses', icon: icons.courses },
     { id: 'assessments', label: 'Assessments', route: '/assessments', icon: icons.assessments },
     { id: 'reports', label: 'Reports', route: '/reports', icon: icons.reports },
   ],
   'Accessibility Trainer': [
     { id: 'dashboard', label: 'Dashboard', route: '/trainer-dashboard', icon: icons.dashboard },
-    { id: 'learners', label: 'Learners', route: '#', icon: icons.students },
+    { id: 'learners', label: 'Learners', route: '/trainer-dashboard?tab=learnerAttendance', icon: icons.students },
     { id: 'skill-reports', label: 'Skill Reports', route: '/reports', icon: icons.reports },
     { id: 'certifications', label: 'Certifications', route: '/certificates', icon: icons.certifications },
   ],
   'Administrator': [
     { id: 'dashboard', label: 'Dashboard', route: '/admin-dashboard', icon: icons.dashboard },
-    { id: 'users', label: 'Users', route: '#', icon: icons.users },
-    { id: 'analytics', label: 'Analytics', route: '#', icon: icons.analytics },
-    { id: 'courses', label: 'Courses', route: '#', icon: icons.courses },
-    { id: 'settings', label: 'Settings', route: '#', icon: icons.settings },
+    { id: 'users', label: 'Users', route: '/admin-dashboard?tab=users', icon: icons.users },
+    { id: 'analytics', label: 'Analytics', route: '/reports', icon: icons.analytics },
+    { id: 'courses', label: 'Courses', route: '/courses', icon: icons.courses },
+    { id: 'settings', label: 'Settings', route: '/profile/edit', icon: icons.settings },
   ]
 };
 
@@ -103,8 +103,8 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
         <nav className="flex flex-col gap-1.5">
           <span className="text-[10px] font-semibold tracking-widest text-white/30 uppercase px-3 mb-1">Menu</span>
           {sidebarItems.map(item => {
-            // Very simple active check
-            const isActive = location.pathname === item.route || (item.route === '#' && location.pathname.includes(item.id));
+            const currentFull = location.pathname + location.search;
+            const isActive = currentFull === item.route || (item.route === location.pathname && !location.search);
             
             return (
               <button

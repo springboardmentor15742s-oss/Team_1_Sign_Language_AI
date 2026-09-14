@@ -1,13 +1,87 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EXPORT_FORMATS } from '../../data/reportData';
+import { exportToCSV, exportToExcel, printOrDownloadPDF } from '../../utils/exportUtils';
 
-export default function ExportCard({ reportTitle = 'this report' }) {
+export default function ExportCard({ reportTitle = 'Progress Report' }) {
   const [toast, setToast] = useState(null);
 
   const handleExport = (fmt) => {
-    setToast(`${fmt.label} action initiated for "${reportTitle}"${fmt.ext ? ` (${fmt.ext})` : ''}`);
-    setTimeout(() => setToast(null), 3000);
+    const cleanTitle = reportTitle || 'Progress Report';
+    const filename = `${cleanTitle.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+
+    // Sample detailed records for this report
+    const reportData = [
+      { Metric: 'Report Name', Value: cleanTitle, Date: new Date().toLocaleDateString() },
+      { Metric: 'Gesture Accuracy', Value: '94.2%', Status: 'Optimal' },
+      { Metric: 'Lessons Completed', Value: '48 / 72', Status: 'In Progress' },
+      { Metric: 'Practice Hours', Value: '24.5 hrs', Status: 'Verified' },
+      { Metric: 'Overall Mastery Level', Value: 'Level 2 Intermediate', Status: 'Certified' }
+    ];
+
+    if (fmt.id === 'pdf') {
+      printOrDownloadPDF({
+        title: cleanTitle,
+        subtitle: 'Official Sign Language AI Progress Report',
+        metadata: {
+          'Overall Accuracy': '94.2%',
+          'Practice Hours': '24.5 hrs',
+          'Status': 'Certified Active',
+          'Verification': 'CERT-VERIFIED-2026'
+        },
+        sections: [
+          {
+            title: 'Key Competencies & Metrics',
+            type: 'table',
+            data: reportData
+          },
+          {
+            title: 'Learning Recommendations',
+            type: 'list',
+            items: [
+              'Continue fingerspelling agility practice at 45 WPM.',
+              'Expand specialized vocabulary in conversational phrases.',
+              'Maintain active daily practice streak for optimal neural retention.'
+            ]
+          }
+        ],
+        action: 'download'
+      });
+      setToast(`PDF Report downloaded successfully for "${cleanTitle}"`);
+    } else if (fmt.id === 'excel') {
+      exportToExcel(reportData, `${filename}.xls`, cleanTitle.slice(0, 30));
+      setToast(`Excel Spreadsheet (.xls) downloaded successfully!`);
+    } else if (fmt.id === 'csv') {
+      exportToCSV(reportData, `${filename}.csv`);
+      setToast(`CSV Data (.csv) downloaded successfully!`);
+    } else if (fmt.id === 'print') {
+      printOrDownloadPDF({
+        title: cleanTitle,
+        subtitle: 'Official Sign Language AI Progress Report',
+        metadata: {
+          'Accuracy': '94.2%',
+          'Practice Hours': '24.5 hrs',
+          'Status': 'Certified'
+        },
+        sections: [
+          { title: 'Performance Summary', type: 'table', data: reportData }
+        ],
+        action: 'print'
+      });
+      setToast(`Print Report dialog initiated!`);
+    } else {
+      // JSON or other formats
+      const jsonStr = JSON.stringify({ title: cleanTitle, exportedAt: new Date().toISOString(), data: reportData }, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${filename}.json`;
+      a.click();
+      setToast(`Report downloaded as JSON!`);
+    }
+
+    setTimeout(() => setToast(null), 3500);
   };
 
   return (

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout, { AuthInput } from '../layouts/AuthLayout';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, KNOWN_ACCOUNTS } from '../context/AuthContext';
 
 function LoginIllustration() {
   const canvasRef = useRef(null);
@@ -267,6 +267,31 @@ export default function LoginPage() {
                 <span>{error}</span>
               </motion.div>
             )}
+
+            {/* Quick Fill Known Logins */}
+            <div className="flex flex-col gap-2 p-3 rounded-2xl bg-white/[0.03] border border-white/10">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-white/50 font-medium">Quick Fill Known Logins:</span>
+                <span className="text-[10px] text-purple-400 font-mono">1-Click Test</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {Object.entries(KNOWN_ACCOUNTS).map(([key, acc]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => {
+                      setEmail(acc.email);
+                      setPassword(acc.password);
+                    }}
+                    className="flex flex-col items-start px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-purple-500/40 text-left transition-all"
+                  >
+                    <span className="text-xs font-semibold text-white">{acc.role}</span>
+                    <span className="text-[10px] text-white/40 truncate max-w-[120px]">{acc.email}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Email */}
             <AuthInput
               id="email" label="Email Address" type="email"

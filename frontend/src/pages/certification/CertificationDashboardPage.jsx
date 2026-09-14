@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import CertificateCard from '../../components/certification/CertificateCard';
 import LoadingSkeleton from '../../components/certification/LoadingSkeleton';
-import { certificatesList, getUserCertificates } from '../../data/assessmentModuleData';
+import { getUserCertificates } from '../../data/assessmentModuleData';
 import { useAuth } from '../../context/AuthContext';
 
 export default function CertificationDashboardPage() {

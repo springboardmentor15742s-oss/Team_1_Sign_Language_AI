@@ -35,7 +35,7 @@ export const KNOWN_ACCOUNTS = {
     allowedRoles: ['Administrator', 'Instructor', 'Accessibility Trainer', 'Learner'],
     badge: 'Platform Administrator',
   },
-  legacyLearner: {
+  signaiLearner: {
     email: 'learner@signai.com',
     password: 'learner123',
     name: 'Alex Morgan',
@@ -43,7 +43,32 @@ export const KNOWN_ACCOUNTS = {
     allowedRoles: ['Learner'],
     badge: 'Standard Learner',
   },
+  signaiInstructor: {
+    email: 'instructor@signai.com',
+    password: 'instructor123',
+    name: 'Prof. Sarah Jenkins',
+    role: 'Instructor',
+    allowedRoles: ['Instructor'],
+    badge: 'Certified Instructor',
+  },
+  signaiTrainer: {
+    email: 'trainer@signai.com',
+    password: 'trainer123',
+    name: 'Marcus Vance',
+    role: 'Accessibility Trainer',
+    allowedRoles: ['Accessibility Trainer'],
+    badge: 'Accessibility Specialist',
+  },
+  signaiAdmin: {
+    email: 'admin@signai.com',
+    password: 'admin123',
+    name: 'Elena Rostova',
+    role: 'Administrator',
+    allowedRoles: ['Administrator', 'Instructor', 'Accessibility Trainer', 'Learner'],
+    badge: 'Platform Administrator',
+  },
 };
+
 
 /* ─── Default User State Fallback ────────────────────────────────── */
 const DEFAULT_USER = {

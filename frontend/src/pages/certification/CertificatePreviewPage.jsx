@@ -87,7 +87,7 @@ export default function CertificatePreviewPage() {
     return (
       <DashboardLayout>
         <div className="text-center py-20">
-          <h2 className="text-2xl font-bold text-white mb-4">Certificate Not Found or Locked</h2>
+          <h2 className="text-2xl font-bold text-white mb-4 italic font-serif">Certificate Not Found or Locked</h2>
           <button onClick={() => navigate('/certificates')} className="btn-primary">Go Back</button>
         </div>
       </DashboardLayout>
@@ -99,7 +99,7 @@ export default function CertificatePreviewPage() {
       <div className="max-w-5xl mx-auto w-full pb-10">
         
         <div className="flex justify-between items-center mb-8">
-          <button onClick={() => navigate('/certificates')} className="text-white/50 hover:text-white flex items-center gap-2 text-sm transition-colors cursor-pointer">
+          <button onClick={() => navigate('/certificates')} className="text-white/50 hover:text-white flex items-center gap-2 text-sm transition-colors">
             ← Back to Certifications
           </button>
           <div className="flex gap-4">

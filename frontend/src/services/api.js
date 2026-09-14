@@ -8,7 +8,6 @@ export async function apiCall(
     const token = localStorage.getItem("token");
     const headers = {};
 
-    // Don't set Content-Type for FormData — the browser sets it with the boundary
     if (body && !(body instanceof FormData)) {
         headers["Content-Type"] = "application/json";
     }
@@ -33,5 +32,4 @@ export async function apiCall(
     return response.json();
 }
 
-// Re-export all backend API functions from the central api module
-export * from "../api/api";
+export * from "../api/api";
