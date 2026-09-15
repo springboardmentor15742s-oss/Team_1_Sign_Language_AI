@@ -1,0 +1,86 @@
+{
+  "family": "sign-language-backend",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::ACCOUNT_ID:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::ACCOUNT_ID:role/ecsTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "sign-language-backend",
+      "image": "ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/sign-language-backend:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "hostPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "ALGORITHM", "value": "HS256" },
+        { "name": "ACCESS_TOKEN_EXPIRE_MINUTES", "value": "1440" },
+        { "name": "MODEL_PATH", "value": "models/" }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:ACCOUNT_ID:secret:sign-language/database-url"
+        },
+        {
+          "name": "SECRET_KEY",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:ACCOUNT_ID:secret:sign-language/jwt-secret"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/sign-language-backend",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      },
+      "mountPoints": [
+        {
+          "sourceVolume": "uploads",
+          "containerPath": "/app/uploads",
+          "readOnly": false
+        },
+        {
+          "sourceVolume": "certificates",
+          "containerPath": "/app/certificates",
+          "readOnly": false
+        }
+      ]
+    }
+  ],
+  "volumes": [
+    {
+      "name": "uploads",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-XXXXXXXX",
+        "transitEncryption": "ENABLED"
+      }
+    },
+    {
+      "name": "certificates",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-YYYYYYYY",
+        "transitEncryption": "ENABLED"
+      }
+    }
+  ],
+  "tags": [
+    { "key": "Project", "value": "AI-Sign-Language-Platform" },
+    { "key": "Environment", "value": "production" },
+    { "key": "Service", "value": "backend" }
+  ]
+}

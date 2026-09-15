@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { getLearnerDashboard } from '../api/api';
 import DashboardLayout from '../layouts/DashboardLayout';
 
 /* ─── Mock Data ─────────────────────────────────────────────────── */
 const quickStats = [
   { label: 'Lessons Completed', value: '48 / 72', change: '+6 this week', color: [168, 85, 247], icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
   { label: 'Practice Hours', value: '24.5 hrs', change: '+3.2 hrs', color: [59, 130, 246], icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
-  { label: 'Overall Accuracy', value: '96.8%', change: '+1.4% AI score', color: [34, 197, 94], icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
+  { label: 'Overall Accuracy', value: '92.5%', change: '+1.4% AI score', color: [34, 197, 94], icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
   { label: 'Weekly Progress', value: '12.5 hrs', change: 'Goal: 15 hrs', color: [236, 72, 153], icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
   { label: 'Achievements', value: '14 Badges', change: 'Latest: Fast Finger', color: [245, 158, 11], icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z' },
 ];
@@ -48,6 +49,8 @@ const calendarDays = Array.from({ length: 28 }, (_, i) => ({
 
 export default function LearnerDashboard() {
   const [userName, setUserName] = useState('Alex Morgan');
+  const [backendStats, setBackendStats] = useState(null);
+  const [isBackendLoaded, setIsBackendLoaded] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -57,7 +60,23 @@ export default function LearnerDashboard() {
       const storedName = localStorage.getItem('mira_user_name');
       if (storedName) setUserName(storedName);
     }
+
+    const userId = user?.id || 1;
+    getLearnerDashboard(userId)
+      .then((data) => {
+        if (data) {
+          setBackendStats(data);
+          setIsBackendLoaded(true);
+        }
+      })
+      .catch((err) => {
+        console.warn('Dashboard fetch warning:', err.message);
+      });
   }, [user]);
+
+  const accuracyDisplay = backendStats?.accuracy_score ? `${backendStats.accuracy_score}%` : '92.5%';
+  const progressDisplay = backendStats?.learning_progress ? `${Math.round(backendStats.learning_progress)}%` : '89.6%';
+  const masteryDisplay = backendStats?.skill_mastery || 'Advanced';
 
   return (
     <DashboardLayout>
@@ -77,12 +96,18 @@ export default function LearnerDashboard() {
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider text-purple-300 bg-purple-500/10 border border-purple-500/30">
-                Level 2 · Intermediate
+                Level: {masteryDisplay}
               </span>
               <span className="text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider text-green-400 bg-green-500/10 border border-green-500/30 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                 14 Day Streak 🔥
               </span>
+              {isBackendLoaded && (
+                <span className="text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  Live PostgreSQL DB
+                </span>
+              )}
             </div>
             <h1 className="text-3xl md:text-4xl font-space font-bold text-white tracking-tight">
               Welcome back, <span style={{ background: 'linear-gradient(135deg, #a855f7, #3b82f6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{userName}</span> 👋
@@ -103,9 +128,9 @@ export default function LearnerDashboard() {
 
             <div className="glass rounded-2xl p-4 flex flex-col gap-1.5 flex-1 min-w-[150px]" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
               <span className="text-xs text-white/40 font-medium">Overall Progress</span>
-              <span className="text-xl font-space font-bold text-white">68% Complete</span>
+              <span className="text-xl font-space font-bold text-white">{progressDisplay}</span>
               <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden mt-1">
-                <div className="bg-gradient-to-r from-pink-500 to-purple-500 h-full rounded-full" style={{ width: '68%' }} />
+                <div className="bg-gradient-to-r from-pink-500 to-purple-500 h-full rounded-full" style={{ width: progressDisplay }} />
               </div>
             </div>
 
@@ -116,7 +141,7 @@ export default function LearnerDashboard() {
               style={{ border: '1px solid rgba(139,92,246,0.2)' }}
             >
               <span className="text-xs text-white/40 font-medium">Performance Score</span>
-              <span className="text-xl font-space font-bold" style={{ color: '#a855f7' }}>87 / 100</span>
+              <span className="text-xl font-space font-bold" style={{ color: '#a855f7' }}>{Math.round(backendStats?.learning_progress || 89.6)} / 100</span>
               <span className="text-[10px] text-purple-400 font-semibold flex items-center gap-1 mt-1 group-hover:gap-2 transition-all">
                 View Report →
               </span>
@@ -145,7 +170,7 @@ export default function LearnerDashboard() {
               style={{ border: '1px solid rgba(34,197,94,0.3)' }}
             >
               <span className="text-xs text-white/40 font-medium">Sign Accuracy</span>
-              <span className="text-xl font-space font-bold text-green-400">94.2%</span>
+              <span className="text-xl font-space font-bold text-green-400">{accuracyDisplay}</span>
               <span className="text-[10px] text-green-400 font-semibold flex items-center gap-1 mt-1 group-hover:gap-2 transition-all">
                 View Accuracy →
               </span>

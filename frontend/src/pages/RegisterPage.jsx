@@ -227,22 +227,34 @@ export default function RegisterPage() {
   const [showPw, setShowPw]     = useState(false);
   const [terms, setTerms]       = useState(false);
   const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
   const [success, setSuccess]   = useState(false);
   const navigate                = useNavigate();
   const { register }            = useAuth();
 
   const strength = getPasswordStrength(password);
 
-  const handleSubmit = e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password || !name) return;
+    if (!name || !email || !password) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+    if (!terms) {
+      setError('Please agree to the Terms of Service and Privacy Policy.');
+      return;
+    }
+    setError('');
     setLoading(true);
-    setTimeout(() => {
-      register({ name, email });
-      setLoading(false);
+    try {
+      await register({ full_name: name, email, password, role: 'learner' });
       setSuccess(true);
       setTimeout(() => navigate('/login'), 1500);
-    }, 2000);
+    } catch (err) {
+      setError(err.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
 
@@ -287,6 +299,18 @@ export default function RegisterPage() {
             onSubmit={handleSubmit}
             className="flex flex-col gap-4"
           >
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-3 rounded-xl flex items-center gap-2.5 text-xs text-rose-300 bg-rose-500/10 border border-rose-500/25"
+              >
+                <svg className="w-4 h-4 flex-shrink-0 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{error}</span>
+              </motion.div>
+            )}
             {/* Name */}
             <AuthInput
               id="reg-name" label="Full Name" type="text"

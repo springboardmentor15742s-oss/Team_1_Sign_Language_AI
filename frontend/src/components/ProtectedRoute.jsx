@@ -1,65 +1,40 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-/**
- * Route Protection Component for Sign Language AI Platform.
- *
- * Three-level guard:
- *   1. Not authenticated              → /login
- *   2. Authenticated but no role set  → /select-role
- *   3. Wrong role for this route      → /unauthorized
- *   4. All checks pass                → render page
- *
- * Props:
- *   allowedRoles  – string | string[]  (optional; omit to allow any authenticated+role user)
- *   children      – JSX to render when authorized
- */
-export default function ProtectedRoute({ allowedRoles, children }) {
-  const { isAuthenticated: contextAuth, role: contextRole } = useAuth();
+export default function ProtectedRoute({
+    allowedRoles,
+    children
+}) {
+    const { isAuthenticated, role: authRole } = useAuth();
+    const location = useLocation();
 
-  /* ── 1. Authentication check ──────────────────────────────── */
-  const isAuthenticated =
-    contextAuth ||
-    localStorage.getItem('mira_authenticated') === 'true';
+    const token = localStorage.getItem("token") || (isAuthenticated ? "session-valid-token" : null);
+    const role = authRole || localStorage.getItem("role") || localStorage.getItem("mira_user_role");
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  /* ── 2. Role-presence check ───────────────────────────────── */
-  const rawRole =
-    contextRole ||
-    localStorage.getItem('mira_user_role') ||
-    localStorage.getItem('user_role') ||
-    localStorage.getItem('role');
-
-  if (!rawRole) {
-    // User is logged in but hasn't selected a role yet
-    return <Navigate to="/select-role" replace />;
-  }
-
-  /* ── 3. Role-match check (only when allowedRoles provided) ── */
-  if (allowedRoles) {
-    const normalizeRole = (r) => {
-      if (!r) return '';
-      const lower = String(r).trim().toLowerCase();
-      if (lower === 'learner') return 'Learner';
-      if (lower === 'instructor') return 'Instructor';
-      if (lower === 'trainer' || lower === 'accessibility trainer' || lower === 'accessibilitytrainer')
-        return 'Accessibility Trainer';
-      if (lower === 'admin' || lower === 'administrator') return 'Administrator';
-      return String(r).trim();
-    };
-
-    const userRole = normalizeRole(rawRole);
-    const allowedList = (Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles]).map(normalizeRole);
-
-    if (!allowedList.includes(userRole)) {
-      return <Navigate to="/unauthorized" replace />;
+    // User not logged in
+    if (!isAuthenticated && !token) {
+        return (
+            <Navigate 
+                to="/login"
+                state={{ from: location }}
+                replace
+            />
+        );
     }
-  }
 
-  /* ── 4. Authorized ────────────────────────────────────────── */
-  return children ? children : <Outlet />;
+    // Role based protection
+    if (
+        allowedRoles &&
+        role &&
+        !allowedRoles.includes(role)
+    ) {
+        return (
+            <Navigate
+                to="/unauthorized"
+                replace
+            />
+        );
+    }
+
+    return children;
 }
-
