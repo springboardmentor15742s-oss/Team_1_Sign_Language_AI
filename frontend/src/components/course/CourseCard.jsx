@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Play, Clock, Star, Users, Award, ChevronRight } from 'lucide-react';
+import { Play, Clock, Star, Users, Award, ChevronRight, CheckCircle2, Video } from 'lucide-react';
 
 export default function CourseCard({ course }) {
   const navigate = useNavigate();
@@ -18,6 +18,9 @@ export default function CourseCard({ course }) {
         return 'text-purple-400 bg-purple-500/10 border-purple-500/30';
     }
   };
+
+  const isCompleted = course.progress === 100;
+  const isStarted = course.progress > 0;
 
   return (
     <motion.div
@@ -51,21 +54,37 @@ export default function CourseCard({ course }) {
             </span>
           </div>
 
-          {/* Progress Overlay if started */}
-          {course.progress > 0 && (
-            <div className="absolute bottom-3 left-3 right-3">
-              <div className="flex items-center justify-between text-[11px] text-white/90 font-medium mb-1 drop-shadow">
-                <span>Course Progress</span>
-                <span className="font-bold text-purple-300">{course.progress}%</span>
-              </div>
-              <div className="w-full bg-black/60 backdrop-blur-md h-2 rounded-full overflow-hidden border border-white/10">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-400 transition-all duration-500"
-                  style={{ width: `${course.progress}%` }}
-                />
-              </div>
+          {/* Real-time Progress Overlay on Thumbnail */}
+          <div className="absolute bottom-3 left-3 right-3">
+            <div className="flex items-center justify-between text-[11px] text-white/90 font-medium mb-1 drop-shadow">
+              <span className="flex items-center gap-1">
+                {isCompleted ? (
+                  <span className="text-emerald-400 font-bold flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> 100% Completed
+                  </span>
+                ) : isStarted ? (
+                  <span className="text-purple-300 font-bold">
+                    In Progress ({course.completedLessonsCount || 0}/{course.totalLessons || 0} Videos)
+                  </span>
+                ) : (
+                  <span className="text-white/60">Not Started (0%)</span>
+                )}
+              </span>
+              <span className={`font-bold ${isCompleted ? 'text-emerald-400' : 'text-purple-300'}`}>
+                {course.progress || 0}%
+              </span>
             </div>
-          )}
+            <div className="w-full bg-black/60 backdrop-blur-md h-2 rounded-full overflow-hidden border border-white/10">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  isCompleted
+                    ? 'bg-gradient-to-r from-emerald-500 to-green-400'
+                    : 'bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-400'
+                }`}
+                style={{ width: `${course.progress || 0}%` }}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Content Body */}
@@ -88,8 +107,8 @@ export default function CourseCard({ course }) {
             </div>
 
             <div className="flex items-center gap-1.5">
-              <Users className="w-3.5 h-3.5 text-blue-400" />
-              <span>{course.totalStudents ? course.totalStudents.toLocaleString() : '1,200+'}</span>
+              <Video className="w-3.5 h-3.5 text-blue-400" />
+              <span>{course.totalLessons || '6'} Lessons</span>
             </div>
 
             <div className="flex items-center gap-1 text-amber-400 font-semibold">
@@ -118,20 +137,27 @@ export default function CourseCard({ course }) {
       <div className="p-5 md:p-6 pt-0">
         <button
           onClick={() => navigate(`/courses/${course.id}`)}
-          className={`w-full py-2.5 px-4 rounded-2xl text-xs font-semibold flex items-center justify-center gap-2 transition-all duration-300 ${
-            course.progress > 0
+          className={`w-full py-2.5 px-4 rounded-2xl text-xs font-semibold flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer ${
+            isCompleted
+              ? 'bg-emerald-600/30 hover:bg-emerald-500/40 text-emerald-200 border border-emerald-500/50 shadow-md shadow-emerald-950/40'
+              : isStarted
               ? 'btn-primary'
               : 'bg-white/10 hover:bg-purple-600/30 text-white border border-white/15 hover:border-purple-500/40'
           }`}
         >
-          {course.progress > 0 ? (
+          {isCompleted ? (
+            <>
+              <Award className="w-4 h-4 text-amber-300" />
+              <span>Certificate Ready (100%)</span>
+            </>
+          ) : isStarted ? (
             <>
               <Play className="w-3.5 h-3.5 fill-white" />
-              <span>Continue Learning</span>
+              <span>Continue Course ({course.progress}%)</span>
             </>
           ) : (
             <>
-              <span>View Course Details</span>
+              <span>Start Course Free</span>
               <ChevronRight className="w-4 h-4 text-white/60 group-hover:translate-x-1 transition-transform" />
             </>
           )}

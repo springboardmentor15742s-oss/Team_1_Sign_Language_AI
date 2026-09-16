@@ -25,6 +25,7 @@ import {
   PROGRESS_REPORT_DATA,
   EXPORT_FORMATS,
 } from '../data/reportData';
+import { exportToCSV, exportToExcel, printOrDownloadPDF } from '../utils/exportUtils';
 
 /* ─── Analytics Section ─────────────────────────────────────────────── */
 function AnalyticsSection() {
@@ -164,7 +165,69 @@ export default function ReportsPage() {
 
   const showToast = (msg) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const handleFormatExport = (fmtId, fmtLabel) => {
+    const reportData = reports.map(r => ({
+      Title: r.title,
+      Category: r.category,
+      Type: r.type,
+      Score: `${r.score}%`,
+      Status: r.status,
+      Date: r.date,
+    }));
+
+    if (fmtId === 'pdf') {
+      printOrDownloadPDF({
+        title: 'Overview Progress Report',
+        subtitle: 'Official Sign Language AI Educational Metrics',
+        metadata: {
+          'Total Reports': reports.length,
+          'Average Score': '91.4%',
+          'Current Streak': '14 Days',
+          'Practice Hours': '24.5 hrs',
+        },
+        sections: [
+          {
+            title: 'Reports Summary',
+            type: 'table',
+            data: reportData,
+          },
+          {
+            title: 'Instructor & AI Evaluation',
+            type: 'list',
+            items: [
+              'Consistent accuracy across foundational ASL gesture sets (>90%).',
+              'Smooth palm transitions and strong baseline posture maintained.',
+              'Recommended next: Intermediate conversational dialogue modules.',
+            ],
+          },
+        ],
+        action: 'download',
+      });
+      showToast('Export PDF successful! File downloaded.');
+    } else if (fmtId === 'excel') {
+      exportToExcel(reportData, 'Overview_Progress_Report.xls', 'Progress Summary');
+      showToast('Export Excel successful! File downloaded.');
+    } else if (fmtId === 'csv') {
+      exportToCSV(reportData, 'Overview_Progress_Report.csv');
+      showToast('Export CSV successful! File downloaded.');
+    } else if (fmtId === 'print') {
+      printOrDownloadPDF({
+        title: 'Overview Progress Report',
+        subtitle: 'Official Sign Language AI Educational Metrics',
+        sections: [
+          {
+            title: 'Reports Breakdown',
+            type: 'table',
+            data: reportData,
+          },
+        ],
+        action: 'print',
+      });
+      showToast('Print Report initiated successfully!');
+    }
   };
 
   const filtered = reports.filter(r => {
@@ -241,7 +304,7 @@ export default function ReportsPage() {
             <div className="flex flex-wrap gap-3 w-full md:w-auto">
               <button
                 id="export-report-btn"
-                onClick={() => showToast('PDF Export started for Overview Report')}
+                onClick={() => handleFormatExport('pdf', 'Export PDF')}
                 className="btn-primary text-sm flex items-center gap-2 justify-center whitespace-nowrap"
                 style={{ padding: '10px 22px' }}
               >
@@ -567,7 +630,7 @@ export default function ReportsPage() {
                   {EXPORT_FORMATS.map(fmt => (
                     <button
                       key={fmt.id}
-                      onClick={() => showToast(`${fmt.label} initiated successfully!`)}
+                      onClick={() => handleFormatExport(fmt.id, fmt.label)}
                       className="p-3 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-xs text-white font-semibold flex items-center justify-between transition-all"
                     >
                       <span className="flex items-center gap-2">

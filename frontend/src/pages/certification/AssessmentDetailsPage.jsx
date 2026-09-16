@@ -5,7 +5,7 @@ import DashboardLayout from '../../layouts/DashboardLayout';
 import AssessmentPlayer from '../../components/certification/AssessmentPlayer';
 import ResultCard from '../../components/certification/ResultCard';
 import LoadingSkeleton from '../../components/certification/LoadingSkeleton';
-import { assessmentsList, assessmentQuestions } from '../../data/assessmentModuleData';
+import { assessmentsList, assessmentQuestions, getAssessmentQuestions } from '../../data/assessmentModuleData';
 
 export default function AssessmentDetailsPage() {
   const { assessmentId } = useParams();
@@ -21,12 +21,12 @@ export default function AssessmentDetailsPage() {
     // Simulate API fetch
     const timer = setTimeout(() => {
       const found = assessmentsList.find(a => a.id === assessmentId);
-      const qs = assessmentQuestions[assessmentId] || [];
+      const qs = getAssessmentQuestions(assessmentId);
       
       setAssessment(found);
       setQuestions(qs);
       setLoading(false);
-    }, 600);
+    }, 400);
     return () => clearTimeout(timer);
   }, [assessmentId]);
 

@@ -17,6 +17,7 @@ import VerifyOTPPage from './pages/VerifyOTPPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import RegisterPage from './pages/RegisterPage';
 import RoleSelectionPage from './pages/RoleSelectionPage';
+import FreeTrialPage from './pages/FreeTrialPage';
 import LearnerDashboard from './pages/LearnerDashboard';
 import ProfilePage from './pages/ProfilePage';
 import EditProfilePage from './pages/EditProfilePage';
@@ -420,6 +421,7 @@ function AnimatedRoutes() {
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/signup" element={<RegisterPage />} />
+            <Route path="/free-trial" element={<FreeTrialPage />} />
             <Route path="/select-role" element={<RoleSelectionPage />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
           </Routes>

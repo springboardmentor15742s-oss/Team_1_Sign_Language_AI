@@ -1,0 +1,130 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sign-language
+  labels:
+    project: ai-sign-language-platform
+
+---
+# ── Kubernetes Secret (populate via kubectl or CI/CD) ──────────
+# kubectl create secret generic sign-language-secrets \
+#   --from-literal=database-url="postgresql+psycopg://user:pass@host:5432/db" \
+#   --from-literal=jwt-secret="your-64-char-hex-secret" \
+#   --namespace sign-language
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sign-language-secrets
+  namespace: sign-language
+type: Opaque
+# stringData:
+#   database-url: "FILL_IN"
+#   jwt-secret: "FILL_IN"
+
+---
+# ── Persistent Volume Claim: Uploads ──────────────────────────
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: uploads-pvc
+  namespace: sign-language
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: efs-sc        # AWS EFS or equivalent cloud storage
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+# ── Persistent Volume Claim: Certificates ─────────────────────
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: certificates-pvc
+  namespace: sign-language
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: efs-sc
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+# ── PostgreSQL Deployment (use RDS in production instead) ──────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: sign-language
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: sign-language-secrets
+                  key: postgres-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sign-language-secrets
+                  key: postgres-password
+            - name: POSTGRES_DB
+              value: sign_language_db
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: sign-language
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: gp2
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-svc
+  namespace: sign-language
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP

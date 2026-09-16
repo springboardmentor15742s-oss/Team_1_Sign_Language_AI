@@ -69,7 +69,7 @@ export const assessmentQuestions = {
     {
       id: 'q1',
       type: 'multiple-choice',
-      prompt: 'Which ASL letter is this?',
+      prompt: 'Which ASL letter is represented by a closed fist with the thumb resting along the side of the index finger?',
       image: 'placeholder',
       options: ['A', 'S', 'T', 'E'],
       correctAnswer: 'A'
@@ -77,7 +77,7 @@ export const assessmentQuestions = {
     {
       id: 'q2',
       type: 'performance',
-      prompt: 'Sign the letter "B"',
+      prompt: 'Sign the letter "B" with your dominant hand facing forward',
       options: [],
       correctAnswer: 'B_gesture_match'
     },
@@ -91,12 +91,153 @@ export const assessmentQuestions = {
     {
       id: 'q4',
       type: 'performance',
-      prompt: 'Sign the number "3"',
+      prompt: 'Sign the number "3" (Thumb, index, and middle finger extended)',
       options: [],
       correctAnswer: '3_gesture_match'
+    },
+    {
+      id: 'q5',
+      type: 'multiple-choice',
+      prompt: 'What is the correct palm orientation when signing the letter "C"?',
+      options: ['Facing inward toward chest', 'Facing outward/sideways', 'Facing directly downward', 'Facing backwards'],
+      correctAnswer: 'Facing outward/sideways'
+    }
+  ],
+  'A002': [
+    {
+      id: 'q201',
+      type: 'multiple-choice',
+      prompt: 'What is the correct starting movement when signing "Hello" in ASL?',
+      options: ['A salute motion starting from the temple', 'A wave from the hip', 'Touching chin with both index fingers', 'Tapping the collarbone'],
+      correctAnswer: 'A salute motion starting from the temple'
+    },
+    {
+      id: 'q202',
+      type: 'performance',
+      prompt: 'Perform the sign for "Thank You" (Flat hand touching chin and moving outward toward the viewer)',
+      options: [],
+      correctAnswer: 'thank_you_gesture_match'
+    },
+    {
+      id: 'q203',
+      type: 'multiple-choice',
+      prompt: 'How do you sign "Please" in ASL?',
+      options: ['Flat hand rubbing circular motion on the chest', 'Fist knocking against open palm', 'Index finger touching nose then ear', 'Two fingers crossed at chest height'],
+      correctAnswer: 'Flat hand rubbing circular motion on the chest'
+    },
+    {
+      id: 'q204',
+      type: 'performance',
+      prompt: 'Sign "Nice to meet you" or the greeting gesture',
+      options: [],
+      correctAnswer: 'greeting_gesture_match'
+    },
+    {
+      id: 'q205',
+      type: 'multiple-choice',
+      prompt: 'Which non-manual signal is critical when asking a "Wh-" question (Who, What, Where)?',
+      options: ['Eyebrows furrowed/lowered slightly', 'Eyebrows raised high', 'Eyes closed', 'Head tilted backwards'],
+      correctAnswer: 'Eyebrows furrowed/lowered slightly'
+    }
+  ],
+  'A003': [
+    {
+      id: 'q301',
+      type: 'multiple-choice',
+      prompt: 'In ASL grammar, what is the most common default sentence structure for declarative statements?',
+      options: ['Topic - Comment (Time-Topic-Comment)', 'Subject - Verb - Object only', 'Object - Verb - Subject', 'Verb - Adverb - Noun'],
+      correctAnswer: 'Topic - Comment (Time-Topic-Comment)'
+    },
+    {
+      id: 'q302',
+      type: 'performance',
+      prompt: 'Demonstrate spatial referencing: establish a referent index point on your left side',
+      options: [],
+      correctAnswer: 'spatial_ref_gesture_match'
+    },
+    {
+      id: 'q303',
+      type: 'multiple-choice',
+      prompt: 'How is past tense typically indicated in an ASL sentence?',
+      options: ['By establishing a time indicator (e.g., YESTERDAY / PAST) moving toward the shoulder at the beginning', 'By adding an "-ed" finger spelling suffix', 'By blinking twice rapidly', 'By repeating the verb 3 times'],
+      correctAnswer: 'By establishing a time indicator (e.g., YESTERDAY / PAST) moving toward the shoulder at the beginning'
+    },
+    {
+      id: 'q304',
+      type: 'performance',
+      prompt: 'Sign a conditional clause with raised eyebrows and slight head tilt',
+      options: [],
+      correctAnswer: 'conditional_clause_gesture_match'
+    }
+  ],
+  'A004': [
+    {
+      id: 'q401',
+      type: 'multiple-choice',
+      prompt: 'How is the sign for "Doctor" typically executed in American Sign Language?',
+      options: ['Tapping the inner wrist (pulse area) with the dominant "M" or curved handshape', 'Touching forehead with thumb', 'Making a stethoscope circular motion', 'Crossing arms across chest'],
+      correctAnswer: 'Tapping the inner wrist (pulse area) with the dominant "M" or curved handshape'
+    },
+    {
+      id: 'q402',
+      type: 'performance',
+      prompt: 'Sign the emergency alert gesture for "Hurt / Pain" by twisting both index fingers toward each other',
+      options: [],
+      correctAnswer: 'pain_gesture_match'
+    },
+    {
+      id: 'q403',
+      type: 'multiple-choice',
+      prompt: 'What is the standard ASL sign for "Hospital"?',
+      options: ['Drawing an "H" cross shape on the upper arm with the index and middle fingers', 'Tapping the chest twice', 'Spelling H-O-S-P', 'Pointing to an imaginary ambulance siren'],
+      correctAnswer: 'Drawing an "H" cross shape on the upper arm with the index and middle fingers'
+    },
+    {
+      id: 'q404',
+      type: 'performance',
+      prompt: 'Perform the sign for "Emergency" (Shaking an "E" handshape back and forth with urgency)',
+      options: [],
+      correctAnswer: 'emergency_gesture_match'
     }
   ]
 };
+
+/**
+ * Safely retrieves questions for any assessment, with guaranteed fallback questions
+ */
+export function getAssessmentQuestions(assessmentId) {
+  if (assessmentQuestions[assessmentId] && assessmentQuestions[assessmentId].length > 0) {
+    return assessmentQuestions[assessmentId];
+  }
+
+  // Find assessment metadata to build contextual fallback questions
+  const meta = assessmentsList.find(a => a.id === assessmentId);
+  const title = meta ? meta.title : 'Sign Language Assessment';
+
+  return [
+    {
+      id: `${assessmentId}_q1`,
+      type: 'multiple-choice',
+      prompt: `Identify the core sign technique required for ${title}:`,
+      options: ['Dominant hand lead with steady baseline', 'Rapid alternating wrist motions', 'Signing strictly behind shoulder plane', 'Static fingers without orientation'],
+      correctAnswer: 'Dominant hand lead with steady baseline'
+    },
+    {
+      id: `${assessmentId}_q2`,
+      type: 'performance',
+      prompt: `Demonstrate the foundational gesture for ${title}`,
+      options: [],
+      correctAnswer: 'standard_gesture_match'
+    },
+    {
+      id: `${assessmentId}_q3`,
+      type: 'multiple-choice',
+      prompt: 'What is the primary function of facial expressions (non-manual markers) in ASL?',
+      options: ['Conveying grammatical nuances, question types, and emotional depth', 'Just decoration and acting', 'Keeping the signer awake', 'Replacing hand movements completely'],
+      correctAnswer: 'Conveying grammatical nuances, question types, and emotional depth'
+    }
+  ];
+}
 
 export const assessmentHistory = [
   {
@@ -121,32 +262,81 @@ export const assessmentHistory = [
   }
 ];
 
-export const certificatesList = [
+export const initialCertificatesList = [
   {
     id: 'C001',
-    courseName: 'ASL Alphabet Mastery',
+    courseId: 'asl-fundamentals-101',
+    courseName: 'Foundations of American Sign Language (ASL)',
     learnerName: 'Alex Morgan',
     issueDate: '2026-06-15',
     status: 'Unlocked',
     level: 'Beginner',
-    verificationId: 'CERT-8472-9102'
+    score: 96,
+    verificationId: 'CERT-SLAI-84729102'
   },
   {
     id: 'C002',
-    courseName: 'Conversational ASL I',
+    courseId: 'everyday-comm-201',
+    courseName: 'Everyday Signs for Daily Conversations',
     learnerName: 'Alex Morgan',
     issueDate: 'N/A',
     status: 'Locked',
     level: 'Intermediate',
+    score: 88,
     progress: 80
   },
   {
     id: 'C003',
-    courseName: 'Professional Interpreter (Medical)',
+    courseId: 'professional-sign-301',
+    courseName: 'Professional & Workplace Sign Communication',
     learnerName: 'Alex Morgan',
     issueDate: 'N/A',
     status: 'Locked',
     level: 'Professional',
+    score: 92,
     progress: 15
   }
 ];
+
+export const certificatesList = initialCertificatesList;
+
+export function getUserCertificates(userEmail = 'default') {
+  try {
+    const key = `mira_user_certificates_${userEmail}`;
+    const stored = localStorage.getItem(key);
+    if (stored) {
+      const customCerts = JSON.parse(stored);
+      // Merge with initial, replacing matching IDs
+      const merged = [...customCerts];
+      initialCertificatesList.forEach(ic => {
+        if (!merged.some(m => m.id === ic.id || m.courseId === ic.courseId)) {
+          merged.push(ic);
+        }
+      });
+      return merged;
+    }
+  } catch (e) {
+    console.error('Error loading user certificates', e);
+  }
+  return initialCertificatesList;
+}
+
+export function saveUserCertificate(cert, userEmail = 'default') {
+  try {
+    const key = `mira_user_certificates_${userEmail}`;
+    const current = getUserCertificates(userEmail);
+    const existingIdx = current.findIndex(c => c.id === cert.id || (c.courseId && c.courseId === cert.courseId));
+    let updated;
+    if (existingIdx >= 0) {
+      updated = [...current];
+      updated[existingIdx] = { ...updated[existingIdx], ...cert, status: 'Unlocked' };
+    } else {
+      updated = [cert, ...current];
+    }
+    localStorage.setItem(key, JSON.stringify(updated));
+    return updated;
+  } catch (e) {
+    console.error('Error saving user certificate', e);
+    return [cert];
+  }
+}

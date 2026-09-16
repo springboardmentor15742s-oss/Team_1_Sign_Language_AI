@@ -1,22 +1,24 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import QuestionCard from './QuestionCard';
 import TimerCard from './TimerCard';
 
-export default function AssessmentPlayer({ assessment, questions, onComplete }) {
+export default function AssessmentPlayer({ assessment, questions = [], onComplete }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const currentQuestion = questions[currentIndex];
-  const progress = ((currentIndex + 1) / questions.length) * 100;
+  const safeQuestions = Array.isArray(questions) && questions.length > 0 ? questions : [];
+  const currentQuestion = safeQuestions[currentIndex] || null;
+  const progress = safeQuestions.length > 0 ? ((currentIndex + 1) / safeQuestions.length) * 100 : 0;
 
   const handleAnswer = (answer) => {
+    if (!currentQuestion) return;
     setAnswers(prev => ({ ...prev, [currentQuestion.id]: answer }));
   };
 
   const handleNext = () => {
-    if (currentIndex < questions.length - 1) {
+    if (currentIndex < safeQuestions.length - 1) {
       setCurrentIndex(prev => prev + 1);
     }
   };
@@ -27,19 +29,31 @@ export default function AssessmentPlayer({ assessment, questions, onComplete }) 
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     setIsSubmitting(true);
     // Simulate submission delay
     setTimeout(() => {
-      // Calculate mock score
       let correct = 0;
-      questions.forEach(q => {
+      safeQuestions.forEach(q => {
         if (answers[q.id] === q.correctAnswer) correct++;
       });
-      const score = Math.round((correct / questions.length) * 100);
-      onComplete({ score, correct, total: questions.length });
-    }, 1500);
-  };
+      const total = safeQuestions.length || 1;
+      const score = Math.round((correct / total) * 100);
+      onComplete({ score, correct, total: safeQuestions.length });
+    }, 1200);
+  }, [answers, safeQuestions, onComplete]);
+
+  if (!currentQuestion) {
+    return (
+      <div className="glass rounded-3xl p-10 text-center flex flex-col items-center gap-4">
+        <h3 className="text-xl font-space font-bold text-white">Preparing Assessment Questions...</h3>
+        <p className="text-sm text-white/50">Questions are being initialized for this assessment.</p>
+        <button onClick={() => window.location.reload()} className="btn-primary text-xs mt-2">
+          Reload Questions
+        </button>
+      </div>
+    );
+  }
 
   if (isSubmitting) {
     return (
@@ -56,7 +70,7 @@ export default function AssessmentPlayer({ assessment, questions, onComplete }) 
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
           <h2 className="text-2xl font-space font-bold text-white">{assessment.title}</h2>
-          <p className="text-sm text-white/50">Question {currentIndex + 1} of {questions.length}</p>
+          <p className="text-sm text-white/50">Question {currentIndex + 1} of {safeQuestions.length}</p>
         </div>
         <TimerCard durationStr={assessment.duration} onTimeUp={handleSubmit} />
       </div>
@@ -91,10 +105,10 @@ export default function AssessmentPlayer({ assessment, questions, onComplete }) 
           ← Previous
         </button>
 
-        {currentIndex === questions.length - 1 ? (
+        {currentIndex === safeQuestions.length - 1 ? (
           <button
             onClick={handleSubmit}
-            disabled={Object.keys(answers).length < questions.length}
+            disabled={Object.keys(answers).length < safeQuestions.length}
             className="px-8 py-2 rounded-xl text-sm font-bold bg-green-500 text-white hover:bg-green-400 shadow-[0_0_15px_rgba(34,197,94,0.3)] transition-all duration-200 disabled:opacity-50 disabled:shadow-none"
           >
             Submit Assessment

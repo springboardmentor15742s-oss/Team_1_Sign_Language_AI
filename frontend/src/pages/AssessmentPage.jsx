@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { evaluateAssessment, getAssessmentHistory, getAssessmentSummary } from '../api/api';
+import { useAuth } from '../context/AuthContext';
 
 import AssessmentHeader   from '../components/assessment/AssessmentHeader';
 import ReferenceGestureCard from '../components/assessment/ReferenceGestureCard';
@@ -61,6 +63,7 @@ function LevelSelector({ levels, selected, onSelect, disabled }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function AssessmentPage() {
+  const { user } = useAuth();
   const [level, setLevel]               = useState(ASSESSMENT_LEVELS[0]);
   const [gestureIndex, setGestureIndex] = useState(0);
   const [captureState, setCaptureState] = useState('idle');    // idle|ready|recording|processing|done
@@ -78,6 +81,44 @@ export default function AssessmentPage() {
   const totalGestures  = level.total;
   const progress       = Math.min(gestureIndex, totalGestures);
 
+  // ─── Load live assessment history & summary from PostgreSQL backend ───────
+  useEffect(() => {
+    let isMounted = true;
+    const uid = user?.id || 1;
+    Promise.allSettled([
+      getAssessmentHistory(uid),
+      getAssessmentSummary(uid)
+    ]).then(([histRes, sumRes]) => {
+      if (!isMounted) return;
+      if (histRes.status === 'fulfilled' && Array.isArray(histRes.value) && histRes.value.length > 0) {
+        const mapped = histRes.value.map(h => ({
+          id: h.id,
+          gesture: h.gesture || 'HELLO',
+          accuracy: Math.round(h.accuracy || 75),
+          attempt: 1,
+          time: h.created_at ? new Date(h.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : getTimestamp(),
+          result: h.result || ((h.accuracy || 0) >= 70 ? 'Pass' : 'Fail'),
+          color: (h.accuracy || 0) >= 70 ? [34, 197, 94] : [239, 68, 68]
+        }));
+        setHistory(mapped);
+      }
+      if (sumRes.status === 'fulfilled' && sumRes.value && sumRes.value.attempted > 0) {
+        const s = sumRes.value;
+        setSummary({
+          attempted: s.attempted,
+          passed: s.passed,
+          failed: s.failed,
+          avgAccuracy: s.avg_accuracy,
+          bestScore: s.best_score,
+          currentStreak: s.current_streak
+        });
+      }
+    }).catch(err => {
+      console.warn('[Assessment] Live history fetch error:', err);
+    });
+    return () => { isMounted = false; };
+  }, [user]);
+
   // ─── Timer ────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (timerActive && timeLeft > 0) {
@@ -89,48 +130,75 @@ export default function AssessmentPage() {
     return () => clearTimeout(timerRef.current);
   }, [timerActive, timeLeft]);
 
-  // ─── Simulate capture flow ────────────────────────────────────────────────
-  const simulateCapture = useCallback(() => {
+  // ─── Simulate capture flow with Backend API ───────────────────────────────
+  const simulateCapture = useCallback(async () => {
     setCaptureState('recording');
     setSessionStatus('Recording');
-    setTimeout(() => {
+    setTimeout(async () => {
       setCaptureState('processing');
       setSessionStatus('Processing');
-      setTimeout(() => {
-        // Generate mock scores
-        const newScores = {};
-        ACCURACY_CATEGORIES.forEach(cat => { newScores[cat.key] = randomScore(); });
+      try {
+        const apiRes = await evaluateAssessment({
+          user_id: user?.id || 1,
+          gesture_name: currentGesture?.name || 'HELLO',
+          expected_sign: currentGesture?.name || 'HELLO'
+        });
+        const resScores = apiRes?.scores || {};
+        const newScores = {
+          overall: apiRes?.overall_accuracy || randomScore(),
+          handShape: resScores.hand_shape || randomScore(),
+          motion: resScores.motion || randomScore(),
+          position: resScores.position || randomScore(),
+          timing: resScores.timing || randomScore(),
+        };
         setScores(newScores);
-        // Select random subset of mistakes (0-3)
-        const numMistakes = Math.floor(Math.random() * 4);
-        setMistakes(numMistakes === 0 ? [] : randomSubset(MISTAKE_TYPES, numMistakes));
+        setMistakes(apiRes?.mistakes || []);
         setShowMistakes(true);
 
-        const overall = newScores['overall'] || randomScore();
-        const passed  = overall >= 70;
-        const result  = passed ? 'Pass' : 'Fail';
-        const col     = passed ? [34, 197, 94] : [239, 68, 68];
+        const overall = newScores.overall;
+        const passed = apiRes?.passed !== undefined ? apiRes.passed : overall >= 70;
+        const result = passed ? 'Pass' : 'Fail';
+        const col = passed ? [34, 197, 94] : [239, 68, 68];
 
-        // Append to history
         setHistory(prev => [
           { id: Date.now(), gesture: currentGesture?.name || '-', accuracy: overall, attempt: 1, time: getTimestamp(), result, color: col },
           ...prev.slice(0, 9),
         ]);
-        // Update summary
         setSummary(prev => ({
           attempted: prev.attempted + 1,
-          passed:    passed ? prev.passed + 1 : prev.passed,
-          failed:    !passed ? prev.failed + 1 : prev.failed,
+          passed: passed ? prev.passed + 1 : prev.passed,
+          failed: !passed ? prev.failed + 1 : prev.failed,
           avgAccuracy: Math.round(((prev.avgAccuracy * prev.attempted + overall) / (prev.attempted + 1)) * 10) / 10,
-          bestScore:  Math.max(prev.bestScore, overall),
+          bestScore: Math.max(prev.bestScore, overall),
           currentStreak: passed ? prev.currentStreak + 1 : 0,
         }));
 
         setCaptureState('done');
         setSessionStatus('Ready');
-      }, 2000);
+      } catch (err) {
+        console.warn("Backend assessment evaluation fallback:", err);
+        const newScores = {};
+        ACCURACY_CATEGORIES.forEach(cat => { newScores[cat.key] = randomScore(); });
+        setScores(newScores);
+        const numMistakes = Math.floor(Math.random() * 4);
+        setMistakes(numMistakes === 0 ? [] : randomSubset(MISTAKE_TYPES, numMistakes));
+        setShowMistakes(true);
+
+        const overall = newScores['overall'] || randomScore();
+        const passed = overall >= 70;
+        const result = passed ? 'Pass' : 'Fail';
+        const col = passed ? [34, 197, 94] : [239, 68, 68];
+
+        setHistory(prev => [
+          { id: Date.now(), gesture: currentGesture?.name || '-', accuracy: overall, attempt: 1, time: getTimestamp(), result, color: col },
+          ...prev.slice(0, 9),
+        ]);
+        setCaptureState('done');
+        setSessionStatus('Ready');
+      }
     }, 1500);
   }, [currentGesture]);
+
 
   const handleStart = () => {
     setCaptureState('ready');

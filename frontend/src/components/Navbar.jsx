@@ -4,8 +4,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import logoImg from '../assets/logo.jpeg';
 
-
-const navItems = ['Features', 'Courses', 'Gesture', 'Tracking', 'Assessment', 'Feedback', 'About', 'Accessibility'];
+const navItems = [
+  { name: 'Features', path: '/courses' },
+  { name: 'Courses', path: '/courses' },
+  { name: 'Gesture AI', path: '/gesture-recognition' },
+  { name: 'Tracking Engine', path: '/tracking/hand' },
+  { name: 'Assessment', path: '/assessment' },
+  { name: 'AI Feedback', path: '/feedback' },
+  { name: 'Intelligence', path: '/learning-intelligence' },
+];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -19,7 +26,6 @@ export default function Navbar() {
     setDropdownOpen(false);
     navigate('/');
   };
-
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -74,62 +80,14 @@ export default function Navbar() {
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
-              item === 'Courses' ? (
-                <Link
-                  key={item}
-                  to="/courses"
-                  className="px-4 py-2 text-sm text-white/60 hover:text-white rounded-lg transition-all duration-200 hover:bg-white/5 cursor-pointer"
-                  style={{ fontWeight: 500, letterSpacing: '0.01em' }}
-                >
-                  {item}
-                </Link>
-              ) : item === 'Gesture' ? (
-                <Link
-                  key={item}
-                  to="/gesture-recognition"
-                  className="px-4 py-2 text-sm text-white/60 hover:text-white rounded-lg transition-all duration-200 hover:bg-white/5 cursor-pointer"
-                  style={{ fontWeight: 500, letterSpacing: '0.01em' }}
-                >
-                  Gesture AI
-                </Link>
-              ) : item === 'Tracking' ? (
-                <Link
-                  key={item}
-                  to="/tracking/hand"
-                  className="px-4 py-2 text-sm text-white/60 hover:text-white rounded-lg transition-all duration-200 hover:bg-white/5 cursor-pointer"
-                  style={{ fontWeight: 500, letterSpacing: '0.01em' }}
-                >
-                  Tracking Engine
-                </Link>
-              ) : item === 'Assessment' ? (
-                <Link
-                  key={item}
-                  to="/assessment"
-                  className="px-4 py-2 text-sm text-white/60 hover:text-white rounded-lg transition-all duration-200 hover:bg-white/5 cursor-pointer"
-                  style={{ fontWeight: 500, letterSpacing: '0.01em' }}
-                >
-                  Assessment
-                </Link>
-              ) : item === 'Feedback' ? (
-                <Link
-                  key={item}
-                  to="/feedback"
-                  className="px-4 py-2 text-sm text-white/60 hover:text-white rounded-lg transition-all duration-200 hover:bg-white/5 cursor-pointer"
-                  style={{ fontWeight: 500, letterSpacing: '0.01em' }}
-                >
-                  AI Feedback
-                </Link>
-              ) : (
-                <motion.a
-                  key={item}
-                  href={`/#${item.toLowerCase()}`}
-                  className="px-4 py-2 text-sm text-white/60 hover:text-white rounded-lg transition-all duration-200 hover:bg-white/5 cursor-pointer"
-                  whileHover={{ scale: 1.04 }}
-                  style={{ fontWeight: 500, letterSpacing: '0.01em' }}
-                >
-                  {item}
-                </motion.a>
-              )
+              <Link
+                key={item.name}
+                to={item.path}
+                className="px-3.5 py-2 text-sm text-white/60 hover:text-white rounded-lg transition-all duration-200 hover:bg-white/5 cursor-pointer"
+                style={{ fontWeight: 500, letterSpacing: '0.01em' }}
+              >
+                {item.name}
+              </Link>
             ))}
           </div>
 
@@ -175,7 +133,15 @@ export default function Navbar() {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                         My Profile
                       </Link>
-                      <Link to="/dashboard" onClick={() => setDropdownOpen(false)}
+                      <Link to={
+                        role === 'Instructor'
+                          ? '/instructor-dashboard'
+                          : role === 'Accessibility Trainer'
+                          ? '/trainer-dashboard'
+                          : role === 'Administrator'
+                          ? '/admin-dashboard'
+                          : '/dashboard'
+                      } onClick={() => setDropdownOpen(false)}
                         className="flex items-center gap-2.5 px-4 py-3 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-all">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
                         Dashboard
@@ -192,9 +158,20 @@ export default function Navbar() {
               </div>
             ) : (
               <>
+                <Link to="/free-trial">
+                  <motion.button
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-purple-300 rounded-lg transition-all duration-200 bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20"
+                    style={{ fontWeight: 600 }}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    Free Trial
+                  </motion.button>
+                </Link>
                 <Link to="/login">
                   <motion.button
-                    className="px-5 py-2 text-sm text-white/70 hover:text-white rounded-lg transition-all duration-200 hover:bg-white/5"
+                    className="px-4 py-2 text-sm text-white/70 hover:text-white rounded-lg transition-all duration-200 hover:bg-white/5"
                     style={{ fontWeight: 500 }}
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.97 }}
@@ -202,7 +179,7 @@ export default function Navbar() {
                     Login
                   </motion.button>
                 </Link>
-                <Link to="/login">
+                <Link to="/register">
                   <motion.button
                     className="btn-primary text-sm relative z-10"
                     style={{ padding: '10px 22px' }}
@@ -240,25 +217,14 @@ export default function Navbar() {
             >
               <div className="pt-4 pb-2 flex flex-col gap-1 border-t border-white/10 mt-3">
                 {navItems.map((item) => (
-                  item === 'Courses' ? (
-                    <Link
-                      key={item}
-                      to="/courses"
-                      className="px-4 py-3 text-sm text-white/70 hover:text-white rounded-lg hover:bg-white/5 transition-all"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      {item}
-                    </Link>
-                  ) : (
-                    <a
-                      key={item}
-                      href={`/#${item.toLowerCase()}`}
-                      className="px-4 py-3 text-sm text-white/70 hover:text-white rounded-lg hover:bg-white/5 transition-all"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      {item}
-                    </a>
-                  )
+                  <Link
+                    key={item.name}
+                    to={item.path}
+                    className="px-4 py-3 text-sm text-white/70 hover:text-white rounded-lg hover:bg-white/5 transition-all"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
                 ))}
                 <div className="flex gap-3 pt-3 mt-1 border-t border-white/10">
                   <Link to="/login" className="flex-1" onClick={() => setMenuOpen(false)}>
@@ -266,7 +232,7 @@ export default function Navbar() {
                       Login
                     </button>
                   </Link>
-                  <Link to="/login" className="flex-1" onClick={() => setMenuOpen(false)}>
+                  <Link to="/register" className="flex-1" onClick={() => setMenuOpen(false)}>
                     <button className="w-full py-2.5 text-sm btn-primary">Get Started</button>
                   </Link>
                 </div>
