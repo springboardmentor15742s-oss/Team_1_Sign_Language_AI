@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dataset Configuration | SignFlow AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .cyan-glow {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4cd7f6;
+            border-radius: 10px;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #15121b;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex items-center justify-center p-md overflow-hidden">
+<!-- Background Atmospheric Effect -->
+<div class="fixed inset-0 pointer-events-none overflow-hidden">
+
+<div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-[120px]"></div>
+</div>
+<!-- Modal Overlay -->
+<div class="relative z-10 w-full max-w-2xl animate-in fade-in zoom-in duration-300">
+<!-- TopAppBar (Simulated in Modal Context) -->
+<div class="bg-surface/80 backdrop-blur-xl border-b border-white/10 rounded-t-xl px-margin-mobile md:px-margin-desktop py-md flex justify-between items-center sticky top-0 z-50">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">dataset</span>
+<h1 class="font-display-lg text-headline-md text-primary tracking-tight">Dataset Settings: ASL Alphabet</h1>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors active:scale-95">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Modal Content Container -->
+<div class="glass-panel rounded-b-xl overflow-hidden">
+<div class="p-lg md:p-xl space-y-lg max-h-[707px] overflow-y-auto custom-scrollbar">
+<!-- Bento Grid Layout for Metadata -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Storage Card -->
+<div class="bg-surface-container-low border border-white/5 p-md rounded-xl">
+<div class="flex justify-between items-start mb-sm">
+<span class="text-label-sm text-on-surface-variant uppercase tracking-wider">Storage Usage</span>
+<span class="material-symbols-outlined text-secondary text-[20px]">cloud</span>
+</div>
+<div class="flex items-baseline gap-xs">
+<span class="font-mono-stats text-mono-stats text-on-surface">1.2 GB</span>
+<span class="text-label-sm text-on-surface-variant">/ 5.0 GB</span>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full mt-md overflow-hidden">
+<div class="bg-secondary h-full cyan-glow" style="width: 24%"></div>
+</div>
+</div>
+<!-- Last Updated Card -->
+<div class="bg-surface-container-low border border-white/5 p-md rounded-xl">
+<div class="flex justify-between items-start mb-sm">
+<span class="text-label-sm text-on-surface-variant uppercase tracking-wider">Synchronization</span>
+<span class="material-symbols-outlined text-tertiary text-[20px]">history</span>
+</div>
+<div class="font-body-md text-on-surface">Oct 24, 2023 at 14:20</div>
+<div class="mt-md flex items-center gap-xs text-label-sm text-secondary">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span>Fully indexed for AI tracking</span>
+</div>
+</div>
+</div>
+<!-- Main Configuration Section -->
+<div class="space-y-md">
+<h2 class="text-label-md text-on-surface-variant uppercase tracking-widest px-xs">Core Controls</h2>
+<div class="space-y-sm">
+<!-- Auto-Learning Toggle -->
+<div class="flex items-center justify-between p-md bg-surface-container border border-white/5 rounded-xl hover:bg-surface-variant/50 transition-colors group">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">psychology</span>
+</div>
+<div>
+<div class="font-label-md text-on-surface">Enable Auto-Learning</div>
+<div class="text-label-sm text-on-surface-variant">Automatically refine sign recognition based on user corrections</div>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Data Augmentation Toggle -->
+<div class="flex items-center justify-between p-md bg-surface-container border border-white/5 rounded-xl hover:bg-surface-variant/50 transition-colors group">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">dynamic_feed</span>
+</div>
+<div>
+<div class="font-label-md text-on-surface">Data Augmentation</div>
+<div class="text-label-sm text-on-surface-variant">Synthetically expand dataset using light and rotation variations</div>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<!-- Training Priority Dropdown -->
+<div class="p-md bg-surface-container border border-white/5 rounded-xl group transition-all">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-tertiary/10 flex items-center justify-center text-tertiary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">priority_high</span>
+</div>
+<div>
+<div class="font-label-md text-on-surface">Training Priority</div>
+<div class="text-label-sm text-on-surface-variant">Allocate processing power focus for this dataset</div>
+</div>
+</div>
+<div class="relative min-w-[160px]">
+<select class="appearance-none w-full bg-surface-container-low border border-outline-variant text-on-surface px-md py-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer font-label-sm">
+<option value="balanced">Balanced</option>
+<option selected="" value="speed">High Speed</option>
+<option value="accuracy">High Accuracy</option>
+<option value="background">Background</option>
+</select>
+<div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="pt-lg flex flex-col md:flex-row md:items-center justify-end gap-md">
+<button class="px-xl py-sm font-label-md text-on-surface-variant hover:text-on-surface transition-colors active:scale-95">
+                        Cancel
+                    </button>
+<button class="px-xl py-md bg-primary text-on-primary-fixed rounded-xl font-display-lg text-label-md shadow-lg shadow-primary/20 hover:translate-y-[-2px] hover:cyan-glow transition-all active:scale-95 flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">save</span>
+                        Save Changes
+                    </button>
+</div>
+</div>
+</div>
+<!-- Bottom Status Bar -->
+<div class="mt-md flex items-center justify-center gap-xl text-label-sm text-on-surface-variant opacity-60">
+<div class="flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span>AI Core Ready</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span>5.2k Samples Indexed</span>
+</div>
+</div>
+</div>
+<!-- Micro-interaction Script -->
+<script>
+        document.querySelectorAll('button, select, input').forEach(element => {
+            element.addEventListener('click', () => {
+                // Subtle haptic-like effect or logging if needed
+                console.log('UI Interaction triggered on:', element.tagName);
+            });
+        });
+
+        // Simple enter animation
+        window.addEventListener('DOMContentLoaded', () => {
+            const modal = document.querySelector('.animate-in');
+            modal.style.opacity = '1';
+        });
+    </script>
+</body></html>

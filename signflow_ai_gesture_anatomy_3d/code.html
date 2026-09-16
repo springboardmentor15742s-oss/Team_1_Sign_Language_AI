@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gesture Anatomy - Lumina Sign System</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0F172A;
+            color: #e7e0ed;
+            overflow: hidden;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ai-glow-cyan {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+            border: 1px solid rgba(6, 182, 212, 0.5);
+        }
+
+        .ai-glow-violet {
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+            border: 1px solid rgba(139, 92, 246, 0.5);
+        }
+
+        .pulse-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .5; transform: scale(1.2); }
+        }
+
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #22d3ee, transparent);
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: scan 4s linear infinite;
+            z-index: 10;
+            opacity: 0.3;
+        }
+
+        @keyframes scan {
+            from { top: 0%; }
+            to { top: 100%; }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#ffb869",
+                        "surface-dim": "#15121b",
+                        "on-surface-variant": "#cbc3d7",
+                        "on-secondary-fixed-variant": "#004e5c",
+                        "inverse-primary": "#6d3bd7",
+                        "on-primary-fixed": "#23005c",
+                        "secondary-fixed-dim": "#4cd7f6",
+                        "on-secondary-fixed": "#001f26",
+                        "on-surface": "#e7e0ed",
+                        "on-primary-fixed-variant": "#5516be",
+                        "on-background": "#e7e0ed",
+                        "primary-fixed": "#e9ddff",
+                        "on-tertiary-fixed": "#2c1700",
+                        "surface-bright": "#3b3742",
+                        "secondary-fixed": "#acedff",
+                        "outline": "#958ea0",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed": "#ffdcbb",
+                        "surface-variant": "#37333d",
+                        "tertiary-container": "#ca801e",
+                        "surface-container": "#211e27",
+                        "inverse-on-surface": "#322f39",
+                        "error-container": "#93000a",
+                        "surface-container-low": "#1d1a23",
+                        "primary-container": "#a078ff",
+                        "surface-container-highest": "#37333d",
+                        "primary": "#d0bcff",
+                        "secondary": "#4cd7f6",
+                        "on-tertiary-fixed-variant": "#673d00",
+                        "on-error-container": "#ffdad6",
+                        "surface-tint": "#d0bcff",
+                        "surface": "#15121b",
+                        "surface-container-lowest": "#0f0d15",
+                        "on-secondary-container": "#00424e",
+                        "on-error": "#690005",
+                        "outline-variant": "#494454",
+                        "on-primary": "#3c0091",
+                        "surface-container-high": "#2c2832",
+                        "on-tertiary": "#482900",
+                        "tertiary-fixed-dim": "#ffb869",
+                        "primary-fixed-dim": "#d0bcff",
+                        "on-tertiary-container": "#3f2300",
+                        "on-primary-container": "#340080",
+                        "secondary-container": "#03b5d3",
+                        "background": "#15121b",
+                        "inverse-surface": "#e7e0ed",
+                        "on-secondary": "#003640"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "xs": "4px",
+                        "unit": "4px",
+                        "md": "16px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "3xl": "64px",
+                        "xl": "32px",
+                        "margin-mobile": "16px",
+                        "2xl": "48px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "mono-stats": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "mono-stats": ["20px", {"lineHeight": "24px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface overflow-hidden h-screen flex flex-col">
+<!-- TopAppBar Shell -->
+<header class="bg-surface/80 dark:bg-surface/80 backdrop-blur-md text-primary dark:text-primary docked full-width top-0 z-50 shadow-sm bg-surface/80 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-gutter w-full h-16 shrink-0">
+<div class="flex items-center gap-4">
+<button class="hover:bg-primary/10 transition-colors duration-200 active:scale-95 transition-transform p-2 rounded-full">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md-mobile md:text-headline-md tracking-tight">Gesture Anatomy</h1>
+</div>
+<button class="hover:bg-primary/10 transition-colors duration-200 active:scale-95 transition-transform p-2 rounded-full">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="relative flex-1 w-full bg-[#0F172A] overflow-hidden">
+<!-- Three.js 3D Viewfinder -->
+<div class="absolute inset-0 z-0">
+<!-- STITCH_THREEJS_START:ANIMATION_16 class="absolute inset-0 w-full h-full" -->
+<div class="absolute inset-0 w-full h-full" style="display:block;">
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+<div id="threejs-container-ANIMATION_16" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_16');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  
+const width = container.clientWidth || window.innerWidth;
+const height = container.clientHeight || window.innerHeight;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+camera.position.set(0, 0, 5);
+
+const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+renderer.setSize(width, height);
+renderer.setPixelRatio(window.devicePixelRatio || 1);
+container.appendChild(renderer.domElement);
+
+// Lighting
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+
+const pointLight = new THREE.PointLight(0x8b5cf6, 2); // Electric Violet
+pointLight.position.set(5, 5, 5);
+scene.add(pointLight);
+
+const secondaryLight = new THREE.PointLight(0x22d3ee, 1.5); // Cyan
+secondaryLight.position.set(-5, -5, 2);
+scene.add(secondaryLight);
+
+// Hand Structure
+const handGroup = new THREE.Group();
+scene.add(handGroup);
+
+// Palm
+const palmGeometry = new THREE.BoxGeometry(1.2, 1.5, 0.3);
+const palmMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0x1d1a23, 
+    transparent: true, 
+    opacity: 0.8,
+    shininess: 100 
+});
+const palm = new THREE.Mesh(palmGeometry, palmMaterial);
+handGroup.add(palm);
+
+// Fingers
+const fingerGeom = new THREE.CylinderGeometry(0.12, 0.12, 1.2, 16);
+const fingerMat = new THREE.MeshPhongMaterial({ color: 0x1d1a23, transparent: true, opacity: 0.6 });
+
+const fingerPositions = [
+    { x: -0.45, y: 1.2, z: 0, rot: 0.05 },  // Index
+    { x: -0.15, y: 1.3, z: 0, rot: 0 },     // Middle
+    { x: 0.15, y: 1.25, z: 0, rot: -0.05 }, // Ring
+    { x: 0.45, y: 1.1, z: 0, rot: -0.1 }    // Pinky
+];
+
+fingerPositions.forEach(pos => {
+    const finger = new THREE.Mesh(fingerGeom, fingerMat);
+    finger.position.set(pos.x, pos.y, pos.z);
+    finger.rotation.z = pos.rot;
+    handGroup.add(finger);
+});
+
+// Thumb
+const thumb = new THREE.Mesh(fingerGeom, fingerMat);
+thumb.position.set(0.7, 0.3, 0);
+thumb.rotation.z = -Math.PI / 3;
+handGroup.add(thumb);
+
+// Landmark Dots (The "Dots")
+const dotGeom = new THREE.SphereGeometry(0.06, 16, 16);
+const dotMat = new THREE.MeshBasicMaterial({ color: 0x22d3ee }); // Cyan Glow
+
+const landmarks = [
+    // Fingertips
+    [-0.47, 1.8, 0], [-0.15, 1.9, 0], [0.17, 1.85, 0], [0.49, 1.7, 0], [1.1, 0.0, 0],
+    // Knuckles
+    [-0.45, 0.8, 0.15], [-0.15, 0.85, 0.15], [0.15, 0.82, 0.15], [0.45, 0.75, 0.15],
+    // Palm base
+    [0, -0.7, 0.15], [0.5, -0.6, 0.15], [-0.5, -0.6, 0.15]
+];
+
+landmarks.forEach(pos => {
+    const dot = new THREE.Mesh(dotGeom, dotMat);
+    dot.position.set(pos[0], pos[1], pos[2]);
+    handGroup.add(dot);
+    
+    // Add a small glow sprite or point light for effect? Let's stick to spheres for stability.
+});
+
+// Animation Loop
+function animate() {
+    requestAnimationFrame(animate);
+    
+    // Subtle breathing/floating motion
+    const time = Date.now() * 0.001;
+    handGroup.rotation.y = Math.sin(time * 0.5) * 0.2;
+    handGroup.position.y = Math.sin(time) * 0.1;
+    
+    renderer.render(scene, camera);
+}
+
+window.addEventListener('resize', () => {
+    const w = container.clientWidth || window.innerWidth;
+    const h = container.clientHeight || window.innerHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+});
+
+animate();
+
+})();
+</script>
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_16 -->
+<div class="scanline"></div>
+<!-- Safe Zone Guides (Optional Aesthetic) -->
+<div class="absolute inset-gutter border-t border-l border-white/5 pointer-events-none"></div>
+<div class="absolute bottom-gutter right-gutter border-b border-r border-white/5 pointer-events-none h-32 w-32"></div>
+</div>
+<!-- HUD Overlays -->
+<div class="absolute inset-0 p-gutter pointer-events-none flex flex-col justify-between">
+<!-- Top HUD Row -->
+<div class="flex justify-between items-start w-full">
+<div class="glass-panel ai-glow-violet rounded-xl px-4 py-3 pointer-events-auto">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-primary pulse-dot"></div>
+<span class="font-label-md text-label-md text-primary tracking-widest uppercase">Live Analysis</span>
+</div>
+</div>
+<!-- Tracking Status Card -->
+<div class="glass-panel ai-glow-cyan rounded-xl p-md w-64 pointer-events-auto">
+<div class="flex justify-between items-center mb-md border-b border-white/10 pb-2">
+<span class="font-label-md text-label-md text-secondary">Tracking Status</span>
+<span class="material-symbols-outlined text-secondary text-sm">sensors</span>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm opacity-70">Engine</span>
+<span class="font-label-sm text-label-sm text-secondary">System Active</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm opacity-70">Detection</span>
+<span class="font-label-sm text-label-sm">21 Landmarks</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm opacity-70">Confidence</span>
+<span class="font-label-sm text-label-sm font-mono-stats text-secondary">98.4%</span>
+</div>
+<div class="w-full bg-white/10 h-1 rounded-full mt-2 overflow-hidden">
+<div class="bg-secondary h-full w-[98.4%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom HUD Row -->
+<div class="flex justify-center items-end w-full mb-20 md:mb-0">
+<!-- Gesture Breakdown Card -->
+<div class="glass-panel ai-glow-violet rounded-2xl p-lg max-w-xl w-full pointer-events-auto mb-10 md:mb-0">
+<div class="flex gap-lg items-center">
+<div class="bg-secondary-container/20 border border-secondary/30 rounded-xl w-24 h-24 flex items-center justify-center">
+<span class="font-display-lg text-secondary text-5xl">A</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<h3 class="font-headline-md text-headline-md text-primary">Letter A</h3>
+<div class="bg-primary/20 text-primary px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter">Correct</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                                Thumb held upright against the index finger. Fingers curled firmly into the palm.
+                            </p>
+<div class="mt-md flex gap-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-sm">check_circle</span>
+<span class="font-label-sm text-label-sm opacity-70">Wrist: Locked</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-sm">check_circle</span>
+<span class="font-label-sm text-label-sm opacity-70">Thumb: Extended</span>
+</div>
+</div>
+</div>
+<div class="hidden md:flex flex-col items-center gap-2">
+<div class="w-12 h-12 rounded-full border-2 border-primary/30 flex items-center justify-center">
+<span class="font-label-md text-label-md text-primary">85%</span>
+</div>
+<span class="font-label-sm text-label-sm text-center">Score</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Float Control (Side HUD) -->
+<div class="absolute right-md top-1/2 -translate-y-1/2 flex flex-col gap-md pointer-events-auto">
+<button class="w-12 h-12 rounded-full glass-panel flex items-center justify-center hover:bg-white/10 transition-all active:scale-90 ai-glow-cyan">
+<span class="material-symbols-outlined text-secondary">3d_rotation</span>
+</button>
+<button class="w-12 h-12 rounded-full glass-panel flex items-center justify-center hover:bg-white/10 transition-all active:scale-90">
+<span class="material-symbols-outlined text-on-surface-variant">grid_on</span>
+</button>
+<button class="w-12 h-12 rounded-full glass-panel flex items-center justify-center hover:bg-white/10 transition-all active:scale-90">
+<span class="material-symbols-outlined text-on-surface-variant">lte_mobiledata_badge</span>
+</button>
+</div>
+</main>
+<!-- BottomNavBar Shell -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface-container/90 dark:bg-surface-container/90 backdrop-blur-2xl border-t border-outline-variant/20 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] flex justify-around items-center h-20 px-4 pb-2 shrink-0">
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-70 hover:opacity-100 transition-opacity active:scale-90 duration-300" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-md text-label-md">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-4 py-1.5 shadow-[0_0_15px_rgba(6,182,212,0.3)] active:scale-90 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">gesture</span>
+<span class="font-label-md text-label-md">Practice</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-70 hover:opacity-100 transition-opacity active:scale-90 duration-300" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md text-label-md">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-70 hover:opacity-100 transition-opacity active:scale-90 duration-300" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions for HUD elements
+        document.querySelectorAll('.glass-panel').forEach(panel => {
+            panel.addEventListener('mousemove', (e) => {
+                const rect = panel.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                panel.style.setProperty('--mouse-x', `${x}px`);
+                panel.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // Simulating confidence flickering for technical feel
+        setInterval(() => {
+            const confidenceVal = (98 + Math.random() * 1).toFixed(1);
+            const confidenceSpan = document.querySelector('.font-mono-stats');
+            if (confidenceSpan) confidenceSpan.textContent = confidenceVal + '%';
+        }, 1500);
+    </script>
+</body></html>

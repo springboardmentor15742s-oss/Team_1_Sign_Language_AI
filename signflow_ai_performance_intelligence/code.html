@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SignFlow AI - Performance Intelligence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-variant": "#494454",
+                    "on-primary-container": "#340080",
+                    "surface-container": "#211e27",
+                    "on-secondary-container": "#00424e",
+                    "on-primary-fixed": "#23005c",
+                    "surface-container-low": "#1d1a23",
+                    "on-background": "#e7e0ed",
+                    "secondary-container": "#03b5d3",
+                    "on-tertiary-container": "#3f2300",
+                    "secondary-fixed": "#acedff",
+                    "inverse-primary": "#6d3bd7",
+                    "primary-container": "#a078ff",
+                    "surface-dim": "#15121b",
+                    "error-container": "#93000a",
+                    "surface-container-high": "#2c2832",
+                    "tertiary": "#ffb869",
+                    "on-tertiary-fixed": "#2c1700",
+                    "on-primary": "#3c0091",
+                    "error": "#ffb4ab",
+                    "surface-variant": "#37333d",
+                    "on-tertiary": "#482900",
+                    "tertiary-fixed": "#ffdcbb",
+                    "surface-tint": "#d0bcff",
+                    "on-secondary-fixed-variant": "#004e5c",
+                    "tertiary-container": "#ca801e",
+                    "primary": "#d0bcff",
+                    "tertiary-fixed-dim": "#ffb869",
+                    "on-error": "#690005",
+                    "inverse-surface": "#e7e0ed",
+                    "surface-bright": "#3b3742",
+                    "on-error-container": "#ffdad6",
+                    "primary-fixed-dim": "#d0bcff",
+                    "outline": "#958ea0",
+                    "inverse-on-surface": "#322f39",
+                    "secondary-fixed-dim": "#4cd7f6",
+                    "surface-container-highest": "#37333d",
+                    "on-secondary": "#003640",
+                    "on-surface": "#e7e0ed",
+                    "background": "#15121b",
+                    "on-surface-variant": "#cbc3d7",
+                    "surface-container-lowest": "#0f0d15",
+                    "surface": "#15121b",
+                    "on-secondary-fixed": "#001f26",
+                    "primary-fixed": "#e9ddff",
+                    "secondary": "#4cd7f6",
+                    "on-tertiary-fixed-variant": "#673d00",
+                    "on-primary-fixed-variant": "#5516be"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "xs": "4px",
+                    "unit": "4px",
+                    "sm": "8px",
+                    "lg": "24px",
+                    "margin-mobile": "16px",
+                    "2xl": "48px",
+                    "md": "16px",
+                    "margin-desktop": "40px",
+                    "gutter": "24px",
+                    "3xl": "64px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "mono-stats": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "mono-stats": ["20px", {"lineHeight": "24px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      body {
+        background-color: #15121b;
+        font-family: 'Inter', sans-serif;
+        color: #e7e0ed;
+      }
+      .glass-card {
+        background: rgba(30, 41, 59, 0.4);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .cyan-glow {
+        filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.4));
+      }
+      .violet-glow {
+        filter: drop-shadow(0 0 12px rgba(139, 92, 246, 0.4));
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #37333d;
+        border-radius: 10px;
+      }
+      .interactive-node:hover {
+        r: 6;
+        fill: #4cd7f6;
+        cursor: pointer;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="custom-scrollbar pb-24">
+<!-- Top App Bar (Shared Component Logic) -->
+<header class="fixed top-0 w-full z-50 bg-surface-dim/80 backdrop-blur-xl border-b border-white/5 shadow-sm h-20 flex justify-between items-center px-lg">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary" data-icon="menu">menu</span>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">SignFlow AI Analytics</h1>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined p-2 hover:bg-surface-variant/50 rounded-full transition-colors" data-icon="notifications">notifications</button>
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold overflow-hidden border-2 border-primary/20">
+<img class="w-full h-full object-cover" data-alt="A professional profile headshot of a young tech-savvy learner with a clean background, soft lighting, and high-tech corporate aesthetic, integrated into a dark mode UI palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuATYAZ22v8zkxdmWmWiYTeRW73O_U0u_uJMQCVKPFK2yNsB1YgUXG6jK5qvkQ9zwdHqeSE-_9VxWbVKqGylfBHlqzebrBiJSWGIw6yIv0Irs44u-BVEVlexaTg9bnl0DGgcFhC5LsoQABg8wsO822UOzJECqZLfONyMthk38p8f_Ga_l7x5UePE81T-BGf-uqbLah_ad56oYNPXd1VlaaSW_0v-0UoraLhWHVPrvnx9dyz3s2jNCkUXlLokCt1Yay-OQsOLKsmeeaw"/>
+</div>
+</div>
+</header>
+<main class="pt-24 px-md lg:px-margin-desktop max-w-7xl mx-auto space-y-lg">
+<!-- Header & Timeframe Selector -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<p class="font-label-md text-label-md text-secondary uppercase tracking-widest">Performance Intelligence</p>
+<h2 class="font-display-lg text-display-lg leading-tight mt-1">Learner Insights</h2>
+</div>
+<div class="flex bg-surface-container p-1 rounded-xl border border-white/5">
+<button class="px-4 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-all">7 Days</button>
+<button class="px-4 py-2 rounded-lg font-label-md text-label-md bg-secondary-container text-on-secondary-container shadow-sm">30 Days</button>
+<button class="px-4 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-all">90 Days</button>
+<button class="px-4 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-all">All Time</button>
+</div>
+</section>
+<!-- Top Bento Row -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Primary Metric Card -->
+<div class="md:col-span-4 glass-card p-xl rounded-2xl relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-8xl" data-icon="verified">verified</span>
+</div>
+<div class="relative z-10">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-secondary" data-icon="target">target</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Aggregate Accuracy</span>
+</div>
+<div class="flex items-baseline gap-sm">
+<span class="font-display-lg text-display-lg text-white violet-glow">94.2%</span>
+<div class="flex items-center text-secondary">
+<span class="material-symbols-outlined text-sm" data-icon="arrow_upward">arrow_upward</span>
+<span class="font-label-sm text-label-sm">+2.4%</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-sm">vs. previous 30-day period</p>
+</div>
+<div class="mt-xl h-1 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[94.2%] violet-glow"></div>
+</div>
+</div>
+<!-- Granular Chart Area -->
+<div class="md:col-span-8 glass-card p-xl rounded-2xl flex flex-col">
+<div class="flex justify-between items-center mb-xl">
+<div>
+<h3 class="font-headline-md text-headline-md">Engagement Trends</h3>
+<div class="flex gap-md mt-1">
+<div class="flex items-center gap-xs">
+<div class="w-3 h-3 rounded-full bg-primary"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Accuracy</span>
+</div>
+<div class="flex items-center gap-xs">
+<div class="w-3 h-3 rounded-full bg-secondary"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Response Speed</span>
+</div>
+</div>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-white transition-colors" data-icon="more_vert">more_vert</button>
+</div>
+<div class="flex-grow relative min-h-[240px]">
+<!-- Simulated HUD Chart -->
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 800 200">
+<defs>
+<lineargradient id="violetGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Grid Lines -->
+<line stroke="#1E293B" stroke-width="1" x1="0" x2="800" y1="50" y2="50"></line>
+<line stroke="#1E293B" stroke-width="1" x1="0" x2="800" y1="100" y2="100"></line>
+<line stroke="#1E293B" stroke-width="1" x1="0" x2="800" y1="150" y2="150"></line>
+<!-- Area Fill -->
+<path d="M0,150 L100,140 L200,160 L300,100 L400,80 L500,90 L600,60 L700,75 L800,40 L800,200 L0,200 Z" fill="url(#violetGradient)"></path>
+<!-- Lines -->
+<path d="M0,150 L100,140 L200,160 L300,100 L400,80 L500,90 L600,60 L700,75 L800,40" fill="none" stroke="#d0bcff" stroke-width="3"></path>
+<path d="M0,180 L100,170 L200,150 L300,140 L400,130 L500,110 L600,120 L700,100 L800,90" fill="none" stroke="#4cd7f6" stroke-dasharray="4" stroke-width="2"></path>
+<!-- Data Nodes -->
+<circle class="interactive-node" cx="100" cy="140" fill="#d0bcff" r="4"></circle>
+<circle class="interactive-node" cx="200" cy="160" fill="#d0bcff" r="4"></circle>
+<circle class="interactive-node" cx="300" cy="100" fill="#d0bcff" r="4"></circle>
+<circle class="interactive-node" cx="400" cy="80" fill="#d0bcff" r="4"></circle>
+<circle class="interactive-node" cx="500" cy="90" fill="#d0bcff" r="4"></circle>
+<circle class="interactive-node" cx="600" cy="60" fill="#d0bcff" r="4"></circle>
+<!-- Simulated Tooltip Popover -->
+<foreignobject height="80" width="200" x="560" y="-10">
+<div class="bg-surface-bright/90 backdrop-blur-md p-2 rounded-lg border border-primary/40 shadow-xl">
+<p class="font-label-sm text-label-sm text-primary mb-1">Tuesday Analysis</p>
+<div class="flex justify-between items-center">
+<span class="text-[10px] text-on-surface-variant">Accuracy:</span>
+<span class="font-mono-stats text-label-md text-white">92%</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-[10px] text-on-surface-variant">Latency:</span>
+<span class="font-mono-stats text-label-md text-white">1.2s</span>
+</div>
+</div>
+</foreignobject>
+</svg>
+</div>
+</div>
+</div>
+<!-- Middle Section: Growth & Details -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Detailed Skill Breakdown -->
+<div class="lg:col-span-7 glass-card rounded-2xl overflow-hidden">
+<div class="p-lg border-b border-white/5 flex justify-between items-center bg-white/5">
+<h3 class="font-headline-md text-headline-md">Skill Mastery Breakdown</h3>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="filter_list">filter_list</span>
+</div>
+<div class="divide-y divide-white/5">
+<!-- Item 1 -->
+<div class="p-lg hover:bg-surface-variant/20 transition-all flex items-center justify-between group">
+<div class="flex items-center gap-lg">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl" data-icon="spellcheck">spellcheck</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-white">Alphabet &amp; Fingerspelling</h4>
+<p class="text-xs text-on-surface-variant">Mastered 26/26 units</p>
+</div>
+</div>
+<div class="flex items-center gap-xl">
+<!-- Micro Sparkline -->
+<svg class="hidden md:block w-24 h-8" viewbox="0 0 100 30">
+<path d="M0,25 L20,20 L40,28 L60,10 L80,15 L100,5" fill="none" stroke="#d0bcff" stroke-width="2"></path>
+</svg>
+<div class="text-right">
+<div class="font-mono-stats text-label-md text-white">98.5%</div>
+<div class="text-[10px] text-secondary">Expert Level</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-white" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="p-lg hover:bg-surface-variant/20 transition-all flex items-center justify-between group">
+<div class="flex items-center gap-lg">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-2xl" data-icon="123">123</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-white">Numerical System</h4>
+<p class="text-xs text-on-surface-variant">Mastered 85/100 units</p>
+</div>
+</div>
+<div class="flex items-center gap-xl">
+<svg class="hidden md:block w-24 h-8" viewbox="0 0 100 30">
+<path d="M0,10 L20,15 L40,10 L60,20 L80,10 L100,22" fill="none" stroke="#4cd7f6" stroke-width="2"></path>
+</svg>
+<div class="text-right">
+<div class="font-mono-stats text-label-md text-white">88.2%</div>
+<div class="text-[10px] text-on-surface-variant">Intermediate</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-white" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="p-lg hover:bg-surface-variant/20 transition-all flex items-center justify-between group">
+<div class="flex items-center gap-lg">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-2xl" data-icon="forum">forum</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-white">Common Daily Phrases</h4>
+<p class="text-xs text-on-surface-variant">Mastered 12/50 units</p>
+</div>
+</div>
+<div class="flex items-center gap-xl">
+<svg class="hidden md:block w-24 h-8" viewbox="0 0 100 30">
+<path d="M0,28 L20,25 L40,20 L60,18 L80,10 L100,5" fill="none" stroke="#ffb869" stroke-width="2"></path>
+</svg>
+<div class="text-right">
+<div class="font-mono-stats text-label-md text-white">74.0%</div>
+<div class="text-[10px] text-tertiary">Growing Fast</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-white" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Growth Momentum Card -->
+<div class="lg:col-span-5 flex flex-col gap-gutter">
+<div class="glass-card p-xl rounded-2xl flex-grow bg-gradient-to-br from-primary-container/10 to-transparent">
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-xl uppercase tracking-wider">Growth Momentum</h3>
+<div class="flex items-end justify-between gap-2 h-48">
+<div class="flex flex-col items-center gap-2 group w-full">
+<div class="w-full bg-surface-variant rounded-t-lg transition-all duration-500 group-hover:bg-primary h-12"></div>
+<span class="text-[10px] text-on-surface-variant">Jan</span>
+</div>
+<div class="flex flex-col items-center gap-2 group w-full">
+<div class="w-full bg-surface-variant rounded-t-lg transition-all duration-500 group-hover:bg-primary h-24"></div>
+<span class="text-[10px] text-on-surface-variant">Feb</span>
+</div>
+<div class="flex flex-col items-center gap-2 group w-full">
+<div class="w-full bg-surface-variant rounded-t-lg transition-all duration-500 group-hover:bg-primary h-20"></div>
+<span class="text-[10px] text-on-surface-variant">Mar</span>
+</div>
+<div class="flex flex-col items-center gap-2 group w-full">
+<div class="w-full bg-surface-variant rounded-t-lg transition-all duration-500 group-hover:bg-primary h-32"></div>
+<span class="text-[10px] text-on-surface-variant">Apr</span>
+</div>
+<div class="flex flex-col items-center gap-2 group w-full">
+<div class="w-full bg-primary rounded-t-lg shadow-[0_-4px_12px_rgba(139,92,246,0.3)] h-40"></div>
+<span class="text-[10px] text-primary font-bold">May</span>
+</div>
+</div>
+<div class="mt-lg p-md bg-white/5 rounded-xl border border-white/5 flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">You're on a <span class="text-white font-bold">14-day mastery streak</span>. Keep it up to unlock Advanced Dialects.</p>
+</div>
+</div>
+<div class="glass-card p-xl rounded-2xl flex items-center justify-between hover:scale-[1.02] transition-transform cursor-pointer">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-error-container/20 flex items-center justify-center text-error">
+<span class="material-symbols-outlined" data-icon="error_outline">error_outline</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-white">Priority Weaknesses</p>
+<p class="text-xs text-on-surface-variant">3 signs need more practice</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="keyboard_arrow_right">keyboard_arrow_right</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-24 right-8 lg:right-margin-desktop bg-primary text-on-primary p-4 rounded-full shadow-2xl flex items-center gap-sm hover:scale-110 active:scale-95 transition-all z-40 group">
+<span class="material-symbols-outlined" data-icon="picture_as_pdf">picture_as_pdf</span>
+<span class="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-500 whitespace-nowrap font-label-md">Generate PDF Report</span>
+</button>
+<!-- Bottom Navigation Bar (Shared Component Logic) -->
+<nav class="lg:hidden fixed bottom-0 left-0 w-full z-50 bg-surface-container-low/90 backdrop-blur-lg border-t border-white/10 shadow-[0_-4px_12px_rgba(0,0,0,0.5)] flex justify-around items-center px-md py-sm pb-safe h-16">
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary transition-all">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm-mobile text-[10px]">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-secondary-container/20 text-secondary rounded-full px-4 py-1">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+<span class="font-label-sm-mobile text-[10px]">Trends</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary transition-all">
+<span class="material-symbols-outlined" data-icon="front_hand">front_hand</span>
+<span class="font-label-sm-mobile text-[10px]">Practice</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary transition-all">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm-mobile text-[10px]">Profile</span>
+</div>
+</nav>
+<!-- Desktop Sidebar (Shared Component Logic) -->
+<aside class="hidden lg:flex flex-col fixed left-0 top-0 h-screen w-72 bg-surface-container border-r border-white/5 shadow-xl z-40 pt-24">
+<div class="px-lg pb-xl border-b border-white/5 flex items-center gap-md">
+<div class="w-12 h-12 rounded-xl bg-primary-container flex items-center justify-center text-on-primary-container font-bold overflow-hidden border-2 border-primary/20">
+<img class="w-full h-full object-cover" data-alt="A sophisticated user avatar of a tech-focused professional, styled with sleek lighting and a professional gaze, set against a modern abstract background that fits the Lumina Sign System dark palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7hdFDRij4HykJrNF0QNJbsbSXvJ5SisyBkvHD-9vsf0FUYIsk4refMWf_gmtNtO4cMfnsPyI0LUD5A1VBnx6Hk4_b_uQcoa4FM-HBvpS4wFHcFl5TEuoiEv00bsWJFQGHFwaMeyz26oqfwdqfg1CYSAy1S8_6Qhd_D4VFpocfvMavQ_b_h94CYnThZfZpw0lE-bH_qY-0KtO_qTj9lgtb_CnRHH-FiYPyRxpO-8zIMiLcAUwVM01s8oENwv2zHLsPzKiUNTy31Ao"/>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-white">Alex Chen</h3>
+<p class="text-xs text-on-surface-variant">Pro Learner • Level 24</p>
+</div>
+</div>
+<div class="mt-lg space-y-1">
+<div class="text-on-surface-variant hover:bg-surface-variant/30 transition-all rounded-xl mx-2 px-4 py-3 flex items-center gap-3 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</div>
+<div class="bg-secondary-container text-on-secondary-container rounded-xl mx-2 px-4 py-3 flex items-center gap-3 shadow-lg">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span class="font-label-md">Performance</span>
+</div>
+<div class="text-on-surface-variant hover:bg-surface-variant/30 transition-all rounded-xl mx-2 px-4 py-3 flex items-center gap-3 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-label-md">Curriculum</span>
+</div>
+<div class="text-on-surface-variant hover:bg-surface-variant/30 transition-all rounded-xl mx-2 px-4 py-3 flex items-center gap-3 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="font-label-md">Community</span>
+</div>
+<div class="text-on-surface-variant hover:bg-surface-variant/30 transition-all rounded-xl mx-2 px-4 py-3 flex items-center gap-3 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md">Settings</span>
+</div>
+</div>
+</aside>
+<script>
+        // Simple micro-interaction for the timeframe buttons
+        const timeframeBtns = document.querySelectorAll('.flex.bg-surface-container button');
+        timeframeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                timeframeBtns.forEach(b => {
+                    b.classList.remove('bg-secondary-container', 'text-on-secondary-container', 'shadow-sm');
+                    b.classList.add('text-on-surface-variant');
+                });
+                btn.classList.add('bg-secondary-container', 'text-on-secondary-container', 'shadow-sm');
+                btn.classList.remove('text-on-surface-variant');
+            });
+        });
+
+        // Simple animation on scroll for cards
+        const observerOptions = {
+            threshold: 0.1
+        };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-4');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-4');
+            observer.observe(card);
+        });
+    </script>
+</body></html>
